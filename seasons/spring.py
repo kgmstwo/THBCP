@@ -19,7 +19,7 @@ STATE_IDLE = 0
 # Other constants
 LED_BRIGHTNESS = 40
 
-def Spring():
+def spring():
     beh.init(0.22, 40, 0.5, 0.1)
 
     state = STATE_IDLE
@@ -58,4 +58,4 @@ def Spring():
 
 # Start!
 
-Spring()
+spring()
