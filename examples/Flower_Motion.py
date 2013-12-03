@@ -54,7 +54,9 @@ def flower_motion():
            
             # Move towards the flower until you bump into it
             # for this demo, assume the first robot on the list is a flower
-            flower = nbrList_getFirstRobot(nbrList)
+##            flower = nbrList_getFirstRobot(nbrList)
+            (color,nbr) = detflower(nbrList)
+            flower = nbr
             if flower != None:
                 # Stop if we get close or bump into the flower
                 #if neighbors.get_nbr_close_range(flower):
@@ -123,5 +125,18 @@ def nbrList_getRobotWithID(nbrList, nbrID):
             return nbr
     return None
                 
+
+def detflower(nbrList):
+    for nbr in nbrList:
+        (unimportant, stuff, colormsg) = hba.get_msg_from_nbr(nbr,0)
+        if colormsg == 0:
+            color = 'red'
+        elif colormsg == 1:
+            color = 'green'
+        elif colormsg == 2:
+            color = 'blue'
+        else:
+            color = 'NOT A FLOWER'
+        return (color, nbr)
 
 flower_motion()
