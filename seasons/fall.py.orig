@@ -29,10 +29,12 @@ RECRUIT_TIME = 10 * 1000
 FOLLOW_TIME = 10 * 1000
 
 def fall():
+    beh.init(0.22, 40, 0.5, 0.1)
 
     state = STATE_IDLE
 
     while True:
+        # run the system updates
         new_nbrs = beh.update()
         
         nbrList = neighbors.get_neighbors()
@@ -40,7 +42,11 @@ def fall():
             print nbrList
         beh_out = beh.BEH_INACTIVE
 
+<<<<<<< Updated upstream
+        # this is the main finite-state machine
+=======
         #FINITE STATE MACHINE
+>>>>>>> Stashed changes
         if state = STATE_IDLE:
             leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
             if rone.button_get_value('r'):
@@ -57,11 +63,30 @@ def fall():
             pass
         elif state = STATE_RETURN_TO_BASE_RECRUIT:
             pass
+<<<<<<< Updated upstream
+        # end of the FSM
+        bump_beh_out = beh.bump_beh(MOTION_TV)
+
+        beh_out = beh.subsume([beh_out, bump_beh_out])
+
+        # set the beh velocities
+        beh.motion_set(beh_out)
+
+        #set the HBA message
+        hba.set_msg(0, 0, 0)
+
+# Helper Functions
+
+
+
+# Start!
+=======
         #END OF FINITE STATE MACHINE 
 
         bump_beh_out = beh.bump_meh(MOTION_TV)
         beh_out = beh.subsume([beh_out, bump_beh_out])
         beh.motion_set(beh_out)
         hba.set_msg(0, 0, 0)
+>>>>>>> Stashed changes
 
 fall()
