@@ -68,6 +68,13 @@ def flower_motion():
 
         elif state == STATE_COLLECT_POLLEN:
             # this is where you will put your clever pollen collection code
+            obs_angle = hba.obstacle_angle_get()
+            if (obs_angle != None):
+                alpha = math2.normalize_angle(obs_angle + math.pi/2)
+                rv = 900 * alpha
+                tv = (MOTION_TV/2)
+            
+            
             # we will just wait for a second, then leave. (this will not collect very much pollen)
             if new_nbrs:
                 print "collect"
