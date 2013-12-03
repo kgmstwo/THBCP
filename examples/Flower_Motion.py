@@ -23,7 +23,7 @@ STATE_MOVE_AWAY_FLOWER = 4
 
 # Other constants
 LED_BRIGHTNESS = 40
-COLLECT_POLLEN_TIME = 3000
+COLLECT_POLLEN_TIME = 5000
 
 def flower_motion():
     beh.init(0.22, 40, 0.5, 0.1)
@@ -73,7 +73,6 @@ def flower_motion():
                 alpha = math2.normalize_angle(obs_angle + math.pi/2)
                 rv = 900 * alpha
                 tv = (MOTION_TV/2)
-            
             
             # we will just wait for a second, then leave. (this will not collect very much pollen)
             if new_nbrs:
