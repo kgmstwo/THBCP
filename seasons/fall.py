@@ -28,3 +28,35 @@ COLLECT_POLLEN_TIME = 3000
 RECRUIT_TIME = 10 * 1000
 FOLLOW_TIME = 10 * 1000
 
+def fall():
+
+    state = STATE_IDLE
+
+    while True:
+        new_nbrs = beh.update()
+        
+        nbrList = neighbors.get_neighbors()
+        if new_nbrs:
+            print nbrList
+        beh_out = beh.BEH_INACTIVE
+
+        #FINITE STATE MACHINE OF DOOM
+        if state = STATE_IDLE:
+            leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
+            if rone.button_get_value('r'):
+                state = STATE_MOVE_TO_FLOWER
+            if new_nbrs:
+                print "idle"
+        elif state = STATE_WANDER:
+            pass
+        elif state = STATE_MOVE_TO_FLOWER:
+            pass
+        elif state = STATE_COLLECT_POLLEN:
+            pass
+        elif state = STATE_RETURN_TO_BASE_RECRUIT:
+            pass
+        elif state = STATE_RETURN_TO_BASE_RECRUIT:
+            pass
+        #END OF FINITE STATE MACHINE OF DOOM
+
+fall()
