@@ -1,5 +1,5 @@
 import rone, sys, math, math2, velocity, leds, neighbors, beh, hba
-#Dvjn
+
 FTL_TV = 100
 FTL_RV = math.pi*1000/2
 LED_BRIGHTNESS = 40
@@ -99,7 +99,7 @@ def flock_demo():
 
         beh_out = beh.BEH_INACTIVE
         if mode == MODE_REMOTE:                
-            buttons = beh.check_buttons()
+            buttons = hba.check_buttons()
         
             if buttons != '':
                 leds.set_pattern('r','blink_fast',LED_BRIGHTNESS)

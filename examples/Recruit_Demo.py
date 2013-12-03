@@ -28,7 +28,7 @@ def recruit_demo():
         # run the system updates
         new_nbrs = beh.update()
         
-        nbrList = neighbors.get_neighbors()
+        nbr_list = neighbors.get_neighbors()
         beh_out = beh.BEH_INACTIVE
 
         # this is the main finite-state machine
@@ -39,6 +39,7 @@ def recruit_demo():
                 error_list = []
             if new_nbrs:
                 print "idle"
+                #print nbr_list
             
         elif state == STATE_MATCH_HEADING:
             leds.set_pattern('b', 'ramp_slow', LED_BRIGHTNESS)
@@ -48,7 +49,7 @@ def recruit_demo():
             # match the heading with the first robot on your nbr list
             # use the average_error_check() function to wait until you get a accurate match
             # for this demo, assume the first robot on the list is a dancing_nbr that is recruiting you to a flower
-            dancing_nbr = nbrList_getFirstRobot(nbrList)
+            dancing_nbr = nbrList_getFirstRobot(nbr_list)
             if dancing_nbr != None:
                 # rotate to face the "dancing" robot
                 tv = 0

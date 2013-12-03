@@ -52,7 +52,7 @@ def flower_motion():
             if new_nbrs:
                 print "move to flower"
            
-            # Move towards the flower for 10 seconds
+            # Move towards the flower until you bump into it
             # for this demo, assume the first robot on the list is a flower
             flower = nbrList_getFirstRobot(nbrList)
             if flower != None:
