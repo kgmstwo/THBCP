@@ -1,5 +1,7 @@
 import rone, sys, math, math2, velocity, pose, motion, leds, neighbors, beh, hba
 
+# hi my github is dumb
+
 ###########################################################
 ##
 ##  Flower Motion
@@ -66,6 +68,15 @@ def flower_motion():
                     beh_out = beh.follow_nbr(flower, MOTION_TV)
                     #print beh_out
 
+        elif state == STATE_BACK_UP:
+            
+            
+            tv = -MOTION_TV
+                
+            if sys.time() > (collect_pollen_start_time + COLLECT_POLLEN_TIME): 
+                state = STATE_COLLECT_POLLEN
+                collect_pollen_start_time = sys.time()
+        
         elif state == STATE_COLLECT_POLLEN:
             # this is where you will put your clever pollen collection code
             # we will just wait for a second, then leave. (this will not collect very much pollen)
