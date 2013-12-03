@@ -1,5 +1,6 @@
 THBCP
 =====
 
-This is Hunter's branch.
-Hunter's branch is best branch.
+The Honey Bee Computer Programmers
+Timothy Hunter Belinda Chrisitian Paul
+
