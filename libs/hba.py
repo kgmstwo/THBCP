@@ -1,5 +1,7 @@
 import rone, sys, math, neighbors, velocity, pose, leds, math2, motion
 
+nav_tower_ids = [124,125,126,127]
+
 def compute_avg_reciever_bearing(reciever_list):
     x = 0.0
     y = 0.0
@@ -63,70 +65,38 @@ def winter_time_keeper(initial_time):
     score_time = sys.time()-initial_time
     return score_time
 
-    
-DISTANCE_LSB_STEP = 300
+
 
 ## use this to get a msg from the nbr that contains (distance, mode, quality)
-def get_msg_from_nbr(nbr):
-
+def get_msg_from_nbr(nbr, new_nbrs):
     if nbr != None:
         ##first get message from provided neighbor
         msg = neighbors.get_nbr_message(nbr)
     
         # If the message was none, return 0 for all the feild. This shouldn't happen but still
-        if msg == None:
+        if msg != '':
+            message = msg.split(',')
+            #if new_nbrs:
+            #    print 'msg=',msg, "split=",message
+            distance = int(message[0])
+            mode = int(message[1])
+            quality = int(message[2])
+            return (distance, mode, quality)
+        else:
             return (0, 0, 0)
-    
-        ##now we must decode this string msg to get distance (4), mode (2), quality (2)
-        # The format is [Distance(4 bits), mode(2 bits), quality(2 bits)]
-    
-        msg = ord(msg[0]) ##ensure that msg is an integer of the first character
-    
-        distance = DISTANCE_LSB_STEP * ((msg & 0xF0) >> 4)
-    
-        ##mode should be 0, 1, 2, 3
-        mode = (msg & 0x0C) >> 2 # Mask the bits and shift them into place
-    
-        ##mode should be 0, 1, 2, 3
-        quality = (msg & 0x03) # Mask the bits, they are already in position
-    
-        return (distance, mode, quality)
     else:
-        return None
+        return (0, 0, 0)
 
 
 ## use this to set a msg to be sent out to all neighbors
 ## distance needs to be between 0-5000mm, mode between 0-3, and quality between 0-3
 ## distance is qualtized to  DISTANCE_LSB_STEP
 def set_msg(distance, mode, quality):
-
     ##now we must convert these values to get distance (4), mode (2), quality (2)
-    # The format is [Distance(4 bits), mode(2 bits), quality(2 bits)]
+    # The format is [Distance, mode,quality]
+    msg = str(distance)+","+str(mode)+","+str(quality)
 
-    distance = int(abs(distance / DISTANCE_LSB_STEP)) ##divide distance by DISTANCE_LSB_STEP to get a smaller num, convert it to an int
-    if (distance > 15): # Make sure the distance fits in 4 bits
-        distance = 15 
-    elif (distance < 0):
-        distance = 0
-    distance_bits = (distance & 0x0F) << 4 # Get the bottom 4 bits and shift them to the top bits
-
-    if (mode > 3):
-        mode = 3
-    elif (mode < 0):
-        mode = 0
-    mode_bits = (mode & 0x03) << 2 # Get the bottom 2 bits and shift them to the 3rd and 4th bits
-
-    if (quality > 3):
-        quality = 3
-    elif (quality < 0):
-        quality = 0
-    quality_bits = (quality & 0x03) # Get the bottom 2 bits of the quality
-
-    ## append these to create msg
-    msg = (distance_bits | mode_bits | quality_bits)
-    msg = chr(msg)
-
-    ##finally set message from provided neighbor
+    ##set message from provided neighbor
     neighbors.set_message(msg)
 
 
@@ -192,9 +162,29 @@ def wait_for_button():
     buttons = check_buttons()
     return buttons
 
-
-
-
+def get_robot_neighbors():
+    nbr_list_out = []
+    nbr_list = neighbors.get_neighbors()
+    for nbr in nbr_list:
+        if neighbors.get_nbr_id(nbr) not in nav_tower_ids:
+            nbr_list_out.append(nbr)
+    return nbr_list_out
+    
+    
+def find_nav_tower_nbr(id):
+    nbr_list = neighbors.get_neighbors()
+    # If low power ID availible, get bearing from it
+    low_power_id = id
+    high_power_id = id - 1
+    nbr_out = None
+    for nbr in nbr_list:
+        if low_power_id == neighbors.get_nbr_id(nbr):
+            nbr_out = nbr
+    # Else take bearing from high power ID
+        elif (high_power_id == neighbors.get_nbr_id(nbr)) and (nbr_out == None):
+            nbr_out = nbr
+    return nbr_out
+        
 
 ###simple leader election-- highest ID
 ###otherwise, return nbr and nbr_id

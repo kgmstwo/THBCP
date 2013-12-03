@@ -167,12 +167,11 @@ IR_XMIT_PERIOD_FUDGE = 30
 
 
 def init(nbr_period):
-    rone.ir_comms_set_message_length(2)
     _nbr_state['time_ir_xmit'] = sys.time()
     _nbr_state['time_ir_xmit_offset'] = 0
     _nbr_state['nbr_period'] = nbr_period
     _nbr_state['nbr_timeout'] = 3 * nbr_period
-    _nbr_state['message'] = '-'
+    _nbr_state['message'] = ''
     _nbr_state['xmit_enable'] = True
     _nbr_state['nbr_list'] = []
     _nbr_state['obstacles'] = None
@@ -184,9 +183,7 @@ def _process_nbr_message(ir_msg):
     if ir_msg == None:
         return None
     else:
-        (msg, receivers_list, transmitters_list) = ir_msg
-        # not a special message type, must be a standard neighbor announce message
-        nbr_id = ord(msg[0])
+        (nbr_id, receivers_list, transmitters_list, range_bits) = ir_msg
             
         # compute the bearing from the receivers_list the message was received on
         x = 0.0
@@ -206,16 +203,15 @@ def _process_nbr_message(ir_msg):
 
         range_bits = len(receivers_list) + len(transmitters_list)
         
-        nbr = (nbr_id, msg[1], bearing, orientation, range_bits)
-        return nbr
+        return (nbr_id, bearing, orientation, range_bits)
 
 
 
 def set_message(message):
     if len(message) == 0:
-        _nbr_state['message'] = '.'
+        _nbr_state['message'] = ''
     else:
-        _nbr_state['message'] = message[0]
+        _nbr_state['message'] = message
 
 
 def get_neighbors():
@@ -278,9 +274,11 @@ def update():
 
     # transmit your announce message
     if _nbr_state['xmit_enable']:
-        IR_msg = chr(rone.get_id()) + _nbr_state['message']
-        rone.ir_comms_send_message(IR_msg)
-    
+        #IR_msg = chr(rone.get_id()) + _nbr_state['message']
+        #rone.ir_comms_send_message(IR_msg)
+        rone.ir_comms_send_message()
+        rone.radio_send_message(chr(rone.get_id()) + _nbr_state['message'])
+
     # walk over neighbor list and timeout old neighbors
     nbr_list = _nbr_state['nbr_list']
     nbr_idx = 0
@@ -300,11 +298,11 @@ def update():
         if ir_msg == None:
             break
 
-        (nbr_ID, nbr_msg, nbr_bearing, nbr_orientation, nbr_range_bits) = _process_nbr_message(ir_msg)
+        (nbr_ID, nbr_bearing, nbr_orientation, nbr_range_bits) = _process_nbr_message(ir_msg)
         #print 'msg recv', nbr_ID            
         if nbr_ID == rone.get_id():
             # this is your own message.  Don't make a neighbor, but process it for obstacles
-            (msg, receivers_list, transmitters_list) = ir_msg
+            (nbr_id, receivers_list, transmitters_list, nbr_range_bits) = ir_msg
             _nbr_state['obstacles'] = receivers_list
             _nbr_state['obstacles_time'] = current_time
             continue
@@ -322,12 +320,34 @@ def update():
                 
         # Add or replace the nbr on the nbr list 
         # note: the order of this tuple is important.  It needs to match the getters above
-        nbr = (nbr_ID, nbr_msg, nbr_bearing, nbr_orientation, nbr_range_bits, current_time)
         if new_nbr:
+            nbr = (nbr_ID, '', nbr_bearing, nbr_orientation, nbr_range_bits, current_time)
             nbr_list.append(nbr)
         else:
+            nbr_msg = get_nbr_message(nbr_list[nbr_idx])
+            nbr = (nbr_ID, nbr_msg, nbr_bearing, nbr_orientation, nbr_range_bits, current_time)
             nbr_list[nbr_idx] = nbr
 
+        while True:
+            #Look for neighbor on the radio queue and if the msg ID is there, make that robot's 
+            #msg the incoming message
+            radio_msg = rone.radio_get_message()
+            if radio_msg == None:
+                # There are no more radio messages, finished updates
+                break
+            else:
+                radio_msg_id = ord(radio_msg[0])
+                nbr_idx = 0
+                while nbr_idx < len(nbr_list):
+                    if get_nbr_id(nbr_list[nbr_idx]) == radio_msg_id:
+                        #make the radio message the nbr's message
+                        radio_msg = radio_msg[1:-1]
+                        #print '>',radio_msg,'<'
+                        (nbr_ID, old_msg, nbr_bearing, nbr_orientation, nbr_range_bits, current_time) = nbr_list[nbr_idx]
+                        nbr = (nbr_ID, radio_msg, nbr_bearing, nbr_orientation, nbr_range_bits, current_time)
+                        nbr_list[nbr_idx] = nbr
+                        break
+                    nbr_idx += 1
     #print 'obs',_nbr_state['obstacles']
     return True
 
