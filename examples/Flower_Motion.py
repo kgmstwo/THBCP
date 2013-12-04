@@ -12,7 +12,7 @@ import rone, sys, math, math2, velocity, pose, motion, leds, neighbors, beh, hba
 
 
 # Basic motion parameters - change carefully
-#MOTION_RV = int(1000 * math.pi * 0.3)
+MOTION_RV = int(1000 * math.pi * 0.3)
 MOTION_TV = 100
 
 # FSM States
@@ -28,13 +28,15 @@ COLLECT_POLLEN_TIME = 5000
 
 def wall_follow(tv):
     obs_angle = hba.obstacle_angle_get()
+    # active = False
     if (obs_angle != None):
         alpha = math2.normalize_angle(obs_angle + math.pi/2)
         rv = 900 * alpha
+        # active = True
     else:
         # no wall.  arc to the right to look for one
         rv = -1000
-    return (tv, rv)
+    return (tv, rv''',active''')
 
 def flower_motion():
     beh.init(0.22, 40, 0.5, 0.1)
@@ -81,14 +83,13 @@ def flower_motion():
 
         elif state == STATE_COLLECT_POLLEN:
             # this is where you will put your clever pollen collection code
-            (tv, rv) = wall_follow(MOTION_TV / 2)
-            velocity.set_tvrv(tv,rv)
-            
             # we will just wait for a second, then leave. (this will not collect very much pollen)
             if new_nbrs:
                 print "collect"
             leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
-            
+            #Follow the "wall" ~should circle around flower
+            (tv, rv''',active''') = wall_follow(MOTION_TV / 2)
+            beh_out = beh.tvrv(tv,rv)
             # Timeout after 5 seconds
             if sys.time() > (collect_pollen_start_time + COLLECT_POLLEN_TIME):
                 state = STATE_MOVE_AWAY_FLOWER
