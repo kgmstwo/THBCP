@@ -25,6 +25,17 @@ STATE_MOVE_AWAY_FLOWER = 4
 LED_BRIGHTNESS = 40
 COLLECT_POLLEN_TIME = 5000
 
+
+def wall_follow(tv):
+    obs_angle = hba.obstacle_angle_get()
+    if (obs_angle != None):
+        alpha = math2.normalize_angle(obs_angle + math.pi/2)
+        rv = 900 * alpha
+    else:
+        # no wall.  arc to the right to look for one
+        rv = -1000
+    return (tv, rv)
+
 def flower_motion():
     beh.init(0.22, 40, 0.5, 0.1)
 
@@ -70,18 +81,15 @@ def flower_motion():
 
         elif state == STATE_COLLECT_POLLEN:
             # this is where you will put your clever pollen collection code
-            obs_angle = hba.obstacle_angle_get()
-            if (obs_angle != None):
-                alpha = math2.normalize_angle(obs_angle + math.pi/2)
-                rv = 900 * alpha
-                tv = (MOTION_TV/2)
+            (tv, rv) = wall_follow(MOTION_TV / 2)
+            velocity.set_tvrv(tv,rv)
             
             # we will just wait for a second, then leave. (this will not collect very much pollen)
             if new_nbrs:
                 print "collect"
             leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
             
-            # Timeout after 1 second
+            # Timeout after 5 seconds
             if sys.time() > (collect_pollen_start_time + COLLECT_POLLEN_TIME):
                 state = STATE_MOVE_AWAY_FLOWER
 
