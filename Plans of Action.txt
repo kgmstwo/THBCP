@@ -1,0 +1,43 @@
+Plans of Action!:
+
+
+
+------------------------------------------------------------------------------
+Fall:
+
+Simple version:
+Send everyone to wander until finding a flower
+Take pollen back to tower
+Wait for human extraction (check for time passed or button press?)
+Repeat
+
+Complex version:
+Send everyone to wander until finding a flower or a time has elapsed
+If flower was found: 
+	Return to tower, recruiting others
+	Wait
+	Return to flower, with a chain of followers :)
+If no flower was found and time ran out: 
+	Return, looking for others who are recruiting
+	If recruiter was found:
+		Start bringing back pollen from recruiter's flower
+	If no recruiter was found: Wander again
+
+
+
+------------------------------------------------------------------------------
+Winter:
+
+
+
+------------------------------------------------------------------------------
+Spring:
+
+
+
+------------------------------------------------------------------------------
+Summer:
+
+
+
+------------------------------------------------------------------------------
