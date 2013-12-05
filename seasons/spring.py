@@ -15,6 +15,14 @@ MOTION_TV = 100
 
 # FSM States
 STATE_IDLE = 0
+STATE_WANDER = 1 
+STATE_MOVE_TO_TREE = 2
+STATE_RETURN = 3
+STATE_RECRUIT = 4
+STATE_FOLLOW = 5
+
+#global data
+Found_Tree = FALSE
 
 # Other constants
 LED_BRIGHTNESS = 40
@@ -37,10 +45,22 @@ def spring():
         if state == STATE_IDLE:
             leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
             if rone.button_get_value('r'):
-                state = STATE_MOVE_TO_FLOWER
+                state = STATE_WANDER
             if new_nbrs:
                 print "idle"
+        elif state == STATE_WANDER:
+            if _tree_Detect():
+                state = STATE_MOVE_TO_TREE
+            #run forward, avoid same direction as neighbors
+        elif state == STATE_MOVE_TO_TREE:
 
+            pass
+        elif state == STATE_RETURN:
+            pass
+        elif state == STATE_RECRUIT:
+            pass
+        elif state == STATE_FOLLOW:
+            pass
         # end of the FSM
         bump_beh_out = beh.bump_beh(MOTION_TV)
 

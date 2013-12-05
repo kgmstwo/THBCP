@@ -18,8 +18,11 @@ STATE_IDLE = 0
 STATE_WANDER = 1
 STATE_MOVE_TO_FLOWER = 2
 STATE_COLLECT_POLLEN = 3
-STATE_RETURN_TO_BASE_FOLLOW = 4
-STATE_RETURN_TO_BASE_RECRUIT = 5
+STATE_RETURN_TO_BASE = 4
+STATE_RETURN_TO_FLOWER = 5
+
+# Global Data
+Found_Flower = False
 
 # Other constants
 LED_BRIGHTNESS = 40
@@ -29,8 +32,9 @@ RECRUIT_TIME = 10 * 1000
 FOLLOW_TIME = 10 * 1000
 
 def fall():
-
+    beh.init(0.22, 40, 0.5, 0.1)
     state = STATE_IDLE
+    motion_start_odo = pose.get_odometer()
 
     while True:
         new_nbrs = beh.update()
@@ -48,14 +52,31 @@ def fall():
             if new_nbrs:
                 print "idle"
         elif state = STATE_WANDER:
+            #run forward, avoid direction of neighbors
             pass
         elif state = STATE_MOVE_TO_FLOWER:
             pass
         elif state = STATE_COLLECT_POLLEN:
             pass
-        elif state = STATE_RETURN_TO_BASE_RECRUIT:
-            pass
-        elif state = STATE_RETURN_TO_BASE_RECRUIT:
+        elif state = STATE_RETURN_TO_BASE:
+            nav_tower = hba.find_nav_tower_nbr(127)
+            if state == STATE_MOVE_TO_TOWER:
+                new_nbrs = beh.update()
+            # Move towards the nav_tower until turning around distance reached
+                if nav_tower != None:      # move forward
+                    beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
+                    leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
+                else:
+                    leds.set_pattern('g', 'circle', LED_BRIGHTNESS)
+                    beh_out = beh.follow_nbr(nav_tower, MOTION_TV)  
+                distance_to_go = (motion_start_odo + MOVE_TO_TOWER_DISTANCE) - pose.get_odometer()
+                beh.motion_set(beh_out)
+                if distance_to_go < 0:    
+                    if Found_Flower:
+                        state = STATE_RETURN_TO_FLOWER
+                    else:
+                        state = STATE_WANDER   
+        elif state = STATE_RETURN_TO_FLOWER:
             pass
         #END OF FINITE STATE MACHINE 
 
