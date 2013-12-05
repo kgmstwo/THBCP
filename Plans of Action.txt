@@ -40,6 +40,8 @@ Requires all robots to be constantly transmitting and receiving
 ------------------------------------------------------------------------------
 Spring:
 
+Simple Version:
+
 Everyone goes wandering
     if you see a tree:
         go to it
