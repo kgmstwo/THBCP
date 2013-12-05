@@ -26,17 +26,7 @@ LED_BRIGHTNESS = 40
 COLLECT_POLLEN_TIME = 5000
 
 
-def wall_follow(tv):
-    obs_angle = hba.obstacle_angle_get()
-    active = False
-    if (obs_angle != None):
-        alpha = math2.normalize_angle(obs_angle + math.pi/2)
-        rv = 900 * alpha
-        active = True
-    else:
-        # no wall.  arc to the right to look for one
-        rv = -1000
-    return (tv, rv,active)
+
 
 def flower_motion():
     beh.init(0.22, 40, 0.5, 0.1)
@@ -87,13 +77,21 @@ def flower_motion():
             if new_nbrs:
                 print "collect"
             leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
-            #Follow the "wall" ~should circle around flower
-            (tv, rv,active) = wall_follow(MOTION_TV / 2)
-            beh_out = beh.tvrv(tv,rv)
             # Timeout after 5 seconds
             if sys.time() > (collect_pollen_start_time + COLLECT_POLLEN_TIME):
                 state = STATE_MOVE_AWAY_FLOWER
-
+            
+            else:
+                rone.motor_set_pwm('l',50)
+                rone.motor_set_pwm('r',-50)
+                sys.sleep(1000)
+                tv = Motion_TV
+                rv = Motion_RV
+                beh_out = beh.tvrv(tv,rv) 
+               
+                
+         
+            
         elif state == STATE_MOVE_AWAY_FLOWER:
             if new_nbrs:
                 print "avoid flower"
