@@ -14,6 +14,7 @@ Repeat
 Complex version:
 Send everyone to wander until finding a flower or a time has elapsed
 If flower was found: 
+	Drive around flower, picking up pollen
 	Return to tower, recruiting others
 	Wait
 	Return to flower, with a chain of followers :)
@@ -42,7 +43,14 @@ Spring:
 
 ------------------------------------------------------------------------------
 Summer:
+Simple Version:
+Place queen bee (off) in center of our half
+Put robots behind blocks and have them drive straight forward for set length of time
 
-
+Complex Version:
+Elect queen bee, have her drive to set spot
+Aim robots towards queen but have some angled slightly off, so they will approach from side
+Drive robots until they get a message from the queen, then towards the queen until they bump
+Have robots back up and head back
 
 ------------------------------------------------------------------------------
