@@ -23,8 +23,8 @@ STATE_MOVE_AWAY_FLOWER = 4
 
 # Other constants
 LED_BRIGHTNESS = 40
-COLLECT_POLLEN_TIME = 7000
-TURN_TIME = 1000
+COLLECT_POLLEN_TIME = 15000
+TURN_TIME = 500
 
 
 
@@ -82,14 +82,14 @@ def flower_motion():
             if sys.time() > (collect_pollen_start_time + COLLECT_POLLEN_TIME):
                 state = STATE_MOVE_AWAY_FLOWER
             
-            elif sys.time() < (collect_pollent_start_time + TURN_TIME):    
+            elif sys.time() < (collect_pollen_start_time + TURN_TIME):    
                 tv = 0
-                rv = Motion_RV
+                rv = 60
                 beh_out = beh.tvrv(tv,rv) 
             
-            elif sys.time() > (collect_pollen_start_time + TURN_TIME):
-                tv = Motion_TV
-                rv = Motion_RV
+            else: 
+                tv = MOTION_TV
+                rv = MOTION_RV
                 beh_out = beh.tvrv(tv,rv)
             
         elif state == STATE_MOVE_AWAY_FLOWER:
@@ -142,7 +142,7 @@ def detflower(nbrList):
             color = 'green'
         elif colormsg == 2:
             color = 'blue'
-        if color not None:
+        if color != None:
             return (color, nbr)
     return (None, None)
 
