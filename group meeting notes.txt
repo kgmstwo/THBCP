@@ -1,0 +1,21 @@
+Engi 128 HBA (Honey Bee Adventures) Group Meeting Notes
+
+
+12/2:
+Looked at autumn code, to-do list
+Set up GitHub to keep code organized
+
+
+12/3:
+More work with GitHub, it's probably working now
+We all looked at the new code to understand it
+Created and started files for each season
+
+T and H: Worked on setting up github
+B: Worked on code for finding flowers
+C: Worked on code for collecting pollen
+P: Worked on code for moving to nav towers
+
+
+12/4:
+
