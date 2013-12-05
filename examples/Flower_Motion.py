@@ -140,12 +140,12 @@ def detflower(nbrList):
         (unimportant, stuff, colormsg) = hba.get_msg_from_nbr(nbr,0)
         if colormsg == 0:
             color = 'red'
-        elif colormsg == 1:b
+        elif colormsg == 1:
             color = 'green'
         elif colormsg == 2:
             color = 'blue'
-        else:
-            color = 'NOT A FLOWER'
-        return (color, nbr)
+        if color not None:
+            return (color, nbr)
+    return (None, None)
 
 flower_motion()
