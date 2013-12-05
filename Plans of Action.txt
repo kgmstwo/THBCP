@@ -39,6 +39,30 @@ Same backup plan, but only if no robots are in light
 ------------------------------------------------------------------------------
 Spring:
 
+Everyone goes wandering
+    if you see a tree:
+        go to it
+        return to base
+        if there is no guide there:
+            you are the guide
+            Dance
+        else:
+            align with guide
+            run forward
+            once you see a tree or bee at tree:
+                go to it and stop
+                broadcast 'im at a tree'
+    else:
+        return to base
+        if/when there is a guide:
+            align with guide
+            run forward
+            once you see a tree or bee at tree:
+                go to it and stop
+                broadcast 'im at a tree'
+
+Notes:
+Guide never makes it to tree (seems safer)
 
 
 ------------------------------------------------------------------------------
