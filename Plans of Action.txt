@@ -27,9 +27,14 @@ If no flower was found and time ran out:
 
 ------------------------------------------------------------------------------
 Winter:
+One function, meant to stay in the light
+Simple Version: Drive towards whichever sensor(s) is (are) in the light
+If no sensors in light, drive quickly in random direction
 
-
-
+Complex Version:
+Drive towards the average of all neighbors in the light
+Requires all robots to be constantly transmitting in receiving
+Same backup plan, but only if no robots are in light
 ------------------------------------------------------------------------------
 Spring:
 
