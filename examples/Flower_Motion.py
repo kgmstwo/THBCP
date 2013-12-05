@@ -23,8 +23,8 @@ STATE_MOVE_AWAY_FLOWER = 4
 
 # Other constants
 LED_BRIGHTNESS = 40
-COLLECT_POLLEN_TIME = 5000
-
+COLLECT_POLLEN_TIME = 7000
+TURN_TIME = 1000
 
 
 
@@ -74,23 +74,23 @@ def flower_motion():
         elif state == STATE_COLLECT_POLLEN:
             # this is where you will put your clever pollen collection code
             # we will just wait for a second, then leave. (this will not collect very much pollen)
+            leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
             if new_nbrs:
                 print "collect"
-            leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
+            
             # Timeout after 5 seconds
             if sys.time() > (collect_pollen_start_time + COLLECT_POLLEN_TIME):
                 state = STATE_MOVE_AWAY_FLOWER
             
-            else:
-                rone.motor_set_pwm('l',50)
-                rone.motor_set_pwm('r',-50)
-                sys.sleep(1000)
-                tv = Motion_TV
+            elif sys.time() < (collect_pollent_start_time + TURN_TIME):    
+                tv = 0
                 rv = Motion_RV
                 beh_out = beh.tvrv(tv,rv) 
-               
-                
-         
+            
+            elif sys.time() > (collect_pollen_start_time + TURN_TIME):
+                tv = Motion_TV
+                rv = Motion_RV
+                beh_out = beh.tvrv(tv,rv)
             
         elif state == STATE_MOVE_AWAY_FLOWER:
             if new_nbrs:
