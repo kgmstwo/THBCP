@@ -57,7 +57,7 @@ def flower_motion():
            
             # Move towards the flower until you bump into it
             # for this demo, assume the first robot on the list is a flower
-##            flower = nbrList_getFirstRobot(nbrList)
+            flower = nbrList_getFirstRobot(nbrList)
             (color,nbr) = detflower(nbrList)
             flower = nbr
             if flower != None:
