@@ -184,57 +184,57 @@ def find_nav_tower_nbr(id):
     return nbr_out
         
 
-###simple leader election-- highest ID
-###otherwise, return nbr and nbr_id
-#def leaderElection_ID(list, includeSelf):
-#    leader_id = 0
-#    leader = 0
-#    if list and len(list) > 0:
-#        for nbr in list:
-#            nbr_id = neighbors.get_nbr_id(nbr)
-#            if (nbr_id > leader_id):
-#                leader = nbr
-#                leader_id = temp_id
-#    if includeSelf:
-#        if rone.get_id() > leader_id:
-#            return (0, rone.get_id())
-#    else:
-#        return (leader, leader_id)
-#    
-#
-#def leaderElection_quality(ourQuality, ourDistance):
-#    ##find max quality
-#    leader = 0
-#    max_quality = 0
-#    distance_final = 0
-#    if nbrList and len(nbrList) > 0:
-#        for nbr in nbrList:
-#            (distance, mode, quality) = get_msg_from_nbr(nbr)
-#            if (quality >= max_quality):
-#                max_quality = quality
-#                leader = nbr
-#    if (ourQuality > max_quality):
-#        return 0
-#    elif (ourQuality == max_quality):
-#        includeSelf = True
-#    else:
-#        includeSelf = False
-#
-#    ##collect all candidates with same quality value
-#    candidates_list = [leader]
-#    if nbrList and len(nbrList) > 0:
-#        for nbr in nbrList:
-#            (distance, mode, quality) = get_msg_from_nbr(nbr)
-#            if (quality == max_quality):
-#                candidates_list.append(nbr)
-#
-#    (leader, leader_id) = leaderElection_ID(candidates_list, includeSelf) ##return candidate with highest ID
-#
-#    ##if a nbr is the leader, get its distance, mode, and quality values; else get ours
-#    if (leader!= 0):
-#        (distance, mode, quality) = get_msg_from_nbr(leader)
-#    else:
-#        distance = ourDistance
-#        quality = ourQuality
-#        
-#    return (leader, quality, distance)
+##simple leader election-- highest ID
+##otherwise, return nbr and nbr_id
+def leaderElection_ID(list, includeSelf):
+    leader_id = 0
+    leader = 0
+    if list and len(list) > 0:
+        for nbr in list:
+            nbr_id = neighbors.get_nbr_id(nbr)
+            if (nbr_id > leader_id):
+                leader = nbr
+                leader_id = temp_id
+    if includeSelf:
+        if rone.get_id() > leader_id:
+            return (0, rone.get_id())
+    else:
+        return (leader, leader_id)
+    
+
+def leaderElection_quality(ourQuality, ourDistance):
+    ##find max quality
+    leader = 0
+    max_quality = 0
+    distance_final = 0
+    if nbrList and len(nbrList) > 0:
+        for nbr in nbrList:
+            (distance, mode, quality) = get_msg_from_nbr(nbr)
+            if (quality >= max_quality):
+                max_quality = quality
+                leader = nbr
+    if (ourQuality > max_quality):
+        return 0
+    elif (ourQuality == max_quality):
+        includeSelf = True
+    else:
+        includeSelf = False
+
+    ##collect all candidates with same quality value
+    candidates_list = [leader]
+    if nbrList and len(nbrList) > 0:
+        for nbr in nbrList:
+            (distance, mode, quality) = get_msg_from_nbr(nbr)
+            if (quality == max_quality):
+                candidates_list.append(nbr)
+
+    (leader, leader_id) = leaderElection_ID(candidates_list, includeSelf) ##return candidate with highest ID
+
+    ##if a nbr is the leader, get its distance, mode, and quality values; else get ours
+    if (leader!= 0):
+        (distance, mode, quality) = get_msg_from_nbr(leader)
+    else:
+        distance = ourDistance
+        quality = ourQuality
+        
+    return (leader, quality, distance)
