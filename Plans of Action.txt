@@ -69,6 +69,9 @@ Guide never makes it to tree (seems safer)
 
 Hunter says: Is there a problem with the guide simply counting bees?
 
+Belinda: wait why can't the guide just wait/direct the other robees at the hive for 
+a fixed amount of time and then return to the tree. Just because there might be
+some straggler robees that might come later?
 
 ------------------------------------------------------------------------------
 Summer:
