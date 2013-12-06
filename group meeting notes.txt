@@ -18,4 +18,12 @@ P: Worked on code for moving to nav towers
 
 
 12/4:
+Worked on Uniform
+I don't remember what else :P
+
+
+12/5:
+Finished plans for each season
+Finished uniform design
+Got several helper functions working
 
