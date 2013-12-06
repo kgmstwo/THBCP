@@ -92,7 +92,7 @@ def update():
     global motion_state
     if motion_state['motion_done'] == True:
         return (0, 0)
-    (x_goal, y_goal) = motion_state['goal_position']
+    (x_goal, y_goal) = motion_state['goal_pos']
     (x_robot, y_robot, heading_robot) = pose.get_pose()
     (distance_goal, heading_goal) = math2.topolar(x_goal - x_robot, y_goal - y_robot)
     heading_goal = math2.normalize_angle(heading_goal)
