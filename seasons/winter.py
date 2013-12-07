@@ -15,6 +15,9 @@ MOTION_TV = 100
 
 # FSM States
 STATE_IDLE = 0
+STATE_DARK = 1
+STATE_LIGHT = 2
+STATE_EDGE_OF_LIGHT = 3
 
 # Other constants
 LED_BRIGHTNESS = 40
@@ -37,9 +40,19 @@ def winter():
         if state == STATE_IDLE:
             leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
             if rone.button_get_value('r'):
-                state = STATE_MOVE_TO_FLOWER
+                initial_time = sys.time()
+                state = STATE_WINTER
             if new_nbrs:
                 print "idle"
+
+        elif state == STATE_LIGHT:
+            pass
+
+        elif state == STATE_DARK:
+            pass
+
+        elif state == STATE_EDGE_OF_LIGHT:
+            pass
 
         # end of the FSM
         bump_beh_out = beh.bump_beh(MOTION_TV)
