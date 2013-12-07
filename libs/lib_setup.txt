@@ -1,3 +1,5 @@
-mcu.program('com18','velocity.py','leds.py','neighborsX.py')
-mcu.program('com18','velocity.py','leds.py','math2.py','poseX.py','motionX.py')
-mcu.program('com33','math2.py','velocity.py','pose.py','motion.py','leds.py','neighbors.py','beh.py','hba.py')
+mcu.program('com16','velocity.py','leds.py','neighborsX.py')
+
+mcu.program('com16','velocity.py','leds.py','math2.py','poseX.py','motionX.py')
+
+mcu.program('com16','math2.py','velocity.py','pose.py','motion.py','leds.py','neighbors.py','beh.py','hba.py')
