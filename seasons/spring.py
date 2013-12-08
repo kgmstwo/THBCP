@@ -81,8 +81,8 @@ def spring():
             pass
         # end of the FSM
         bump_beh_out = beh.bump_beh(MOTION_TV)
-
-        beh_out = beh.subsume([beh_out, bump_beh_out])
+        if state != STATE_MOVE_TO_TOWER:
+            beh_out = beh.subsume([beh_out, bump_beh_out])
 
         # set the beh velocities
         beh.motion_set(beh_out)
