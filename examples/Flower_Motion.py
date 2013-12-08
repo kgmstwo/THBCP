@@ -60,7 +60,7 @@ def flower_motion():
             flower = nbrList_getFirstRobot(nbrList)
             (color,nbr) = detflower(nbrList)
             flower = nbr
-            if flower != None and color == 'green':
+            if flower != None and color == 'blue':
                 # Stop if we get close or bump into the flower
                 #if neighbors.get_nbr_close_range(flower):
                 if (neighbors.get_nbr_range_bits(flower) > 6) or (beh.bump_angle_get() != None):
