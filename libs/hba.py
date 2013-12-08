@@ -68,7 +68,7 @@ def winter_time_keeper(initial_time):
 
 
 ## use this to get a msg from the nbr that contains (distance, mode, quality)
-def get_msg_from_nbr(nbr):
+def get_msg_from_nbr(nbr, new_nbrs): # N.B. the parameter new_nbrs is never used
     if nbr != None:
         ##first get message from provided neighbor
         msg = neighbors.get_nbr_message(nbr)
