@@ -50,11 +50,7 @@ def winter():
                 print "idle"
 
         elif state == STATE_LIGHT:
-
-            nbr_in_dark = get_nearest_nbr_in_dark()
-
             nbr_in_dark = get_nearest_nbr_in_dark(nbr_list)
-
             if nbr_in_dark != None:
                 bearing = neighbors.get_nbr_bearing(nbr_in_dark)
                 bearing = bearing - math.pi
@@ -99,13 +95,9 @@ def winter():
         beh.motion_set(beh_out)
 
         #set the HBA message
-        msg = [0]
+        msg = [0, 0, 0]
         msg[MSG_POS_IN_LIGHT] = self_in_light()
-
-        hba.set_msg(msg,msg,msg)
-
         hba.set_msg(msg, msg, msg)
-
 
 # Helper functions
 
