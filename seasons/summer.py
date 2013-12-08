@@ -20,6 +20,9 @@ STATE_BUMP_QUEEN = 2
 STATE_RETURN = 3
 STATE_QUEEN = 4
 
+# MSG items
+MSG_STATE = 0
+
 # Other constants
 LED_BRIGHTNESS = 40
 
@@ -39,8 +42,7 @@ def summer():
 
         # this is the main finite-state machine
         if state == STATE_IDLE:
-            leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
-            leds.set_pattern('b', 'circle', LED_BRIGHTNESS)
+            leds.set_pattern('rb', 'circle', LED_BRIGHTNESS)
             if rone.button_get_value('r'):
                 state = STATE_FIND_QUEEN
             if rone.button_get_value('b'):
@@ -48,6 +50,7 @@ def summer():
             if new_nbrs:
                 print "idle"
         elif state == STATE_FIND_QUEEN:
+            leds.set_pattern('r', 'ramp_slow', LED_BRIGHTNESS)
             beh_out = (MOTION_TV, 0)
             queen = get_queen()
             if not queen == None:
@@ -56,6 +59,7 @@ def summer():
                 #go straight and hope for the best
                 beh_out = beh.tvrv(MOTION_TV, MOTION_RV)
         elif state == STATE_BUMP_QUEEN:
+            leds.set_pattern('r', 'ramp_fast', LED_BRIGHTNESS)
             queen = get_queen()
             if queen == None:
                 state = STATE_RETURN
@@ -65,6 +69,7 @@ def summer():
                 else:
                     beh_out = beh.follow_nbr(queen, MOTION_TV)
         elif state == STATE_RETURN:
+            leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
             if rone.button_get_value('r'):
                 state = STATE_FIND_QUEEN
 
