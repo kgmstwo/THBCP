@@ -20,9 +20,6 @@ STATE_BUMP_QUEEN = 2
 STATE_RETURN = 3
 STATE_QUEEN = 4
 
-# MSG items
-MSG_STATE = 0
-
 # Other constants
 LED_BRIGHTNESS = 40
 
@@ -89,9 +86,7 @@ def summer():
         beh.motion_set(beh_out)
 
         #set the HBA message
-        msg = [0,0,0]
-        msg[MSG_STATE] = state
-        hba.set_msg(msg)
+        hba.set_msg([state, 0, 0])
 
 # Helper functions
 def get_queen():

@@ -21,9 +21,6 @@ STATE_RETURN = 3
 STATE_RECRUIT = 4
 STATE_FOLLOW = 5
 
-# MSG items
-MSG_STATE = 0
-
 #global data
 Found_Tree = FALSE
 
@@ -99,9 +96,7 @@ def spring():
         beh.motion_set(beh_out)
 
         #set the HBA message
-        msg = [0, 0, 0]
-        msg[MSG_STATE] = state
-        hba.set_msg(msg)
+        hba.set_msg([state, 0, 0])
 
 # Helper functions
 def light_diff():
