@@ -52,7 +52,7 @@ def summer():
                 print "idle"
         elif state == STATE_FIND_QUEEN:
             leds.set_pattern('r', 'ramp_slow', LED_BRIGHTNESS)
-            beh_out = (MOTION_TV, 0, True)
+            beh_out = beh.tvrv(MOTION_TV, 0)
             queen = get_queen()
             if not queen == None:
                 state = STATE_BUMP_QUEEN
@@ -85,8 +85,8 @@ def summer():
 
         # end of the FSM
         bump_beh_out = beh.bump_beh(MOTION_TV)
-        beh_out = beh.subsume([beh_out, bump_beh_out])
-
+        if not state == STATE_QUEEN
+            beh_out = beh.subsume([beh_out, bump_beh_out])
 
         # set the beh velocities
         beh.motion_set(beh_out)
