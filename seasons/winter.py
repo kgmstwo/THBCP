@@ -118,6 +118,7 @@ def get_nbrs_in_light():
 def get_nbrs_in_dark():
     nbr_list = hba.get_robot_neighbors()
     nbrs_in_dark = []
+    new_nbrs = 1
     for nbr in nbr_list:
         in_light = hba.get_msg_from_nbr(nbr, new_nbrs)[MSG_POS_IN_LIGHT]
         if not in_light:
