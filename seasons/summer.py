@@ -86,7 +86,7 @@ def summer():
         beh.motion_set(beh_out)
 
         #set the HBA message
-        hba.set_msg([state, 0, 0])
+        hba.set_msg(state, 0, 0)
 
 # Helper functions
 def get_queen():
