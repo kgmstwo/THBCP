@@ -48,15 +48,18 @@ def spring():
             if new_nbrs:
                 print "idle"
         elif state == STATE_WANDER:
-            if _tree_Detect():
+            if tree_detect():
                 state = STATE_MOVE_TO_TREE
-            #run forward, avoid same direction as neighbors
+            else:
+                #right now just runs forward, get fancy?
+                beh_out = beh.tvrv(MOTION_TV, MOTION_RV)
         elif state == STATE_MOVE_TO_TREE:
             if not beh.bump_angle_get() == None:
                 motion_start_odo = pose.get_odometer()
                 state = STATE_RETURN
             else:
-                #drive towards the light
+                (tv, rv) = go_to_tree()
+                beh_out = beh.tvrv(tv, rv)
                 pass
         elif state == STATE_RETURN:
             nav_tower = hba.find_nav_tower_nbr(127)
@@ -101,6 +104,10 @@ def spring():
 def light_diff():
     lightdiff = rone.light_sensor_get_value('fl')-rone.light_sensor_get_value('fr')
     return lightdiff #positive = right, negative = left
+
+def light_diff():
+    return rone.light_sensor_get_value('fl')+rone.light_sensor_get_value('fr')
+
 def go_to_tree():
     diff = light_diff() - diff_start
     if diff > 50:
