@@ -96,14 +96,15 @@ def fall():
             new_nbrs = beh.update()
         # Move towards the nav_tower until turning around distance reached
             if nav_tower != None:      # move forward
-                beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
-                leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
-                if get_nbr_range_bits(leader) < 3:
-                    state == STATE_RECRUIT
-            else:
-                leds.set_pattern('g', 'circle', LED_BRIGHTNESS)
-                beh_out = beh.follow_nbr(nav_tower, MOTION_TV)  
+                if get_nbr_range_bits(leader) > 2:
+                    beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
+                    leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
+                elif get_nbr_range_bits(leader) < 2 and Found_Flower:
+                    state = STATE_RECRUIT
+                else:
+                    state = STATE_WANDER
             distance_to_go = (motion_start_odo + MOVE_TO_TOWER_DISTANCE) - pose.get_odometer()
+            # wait do we still need this
             beh.motion_set(beh_out)
             if distance_to_go < 0:    
                 if Found_Flower:
