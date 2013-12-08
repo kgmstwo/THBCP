@@ -8,7 +8,6 @@ import rone, sys, math, math2, velocity, pose, motion, leds, neighbors, beh, hba
 #
 # This is the code for the Spring season.
 
-
 # Basic motion parameters - change carefully
 MOTION_RV = int(1000 * math.pi * 0.3)
 MOTION_TV = 100
@@ -96,7 +95,7 @@ def spring():
         beh.motion_set(beh_out)
 
         #set the HBA message
-        hba.set_msg([state, 0, 0])
+        hba.set_msg(state, 0, 0)
 
 # Helper functions
 def light_diff():
