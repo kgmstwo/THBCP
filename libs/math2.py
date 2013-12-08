@@ -38,7 +38,7 @@ import math
 ##                1. theta - the angle theta to normalize
 ##
 ##            RETURN
-##                the normalize versin of theta that is contrained between zero to two pi.
+##                the normalize versin of theta that is contrained between -pi to pi.
 ##
 ##        smallest_angle_diff(current_angle, goal_angle)
 ##             calculates the difference between current and goal angle
