@@ -42,7 +42,8 @@ def summer():
 
         # this is the main finite-state machine
         if state == STATE_IDLE:
-            leds.set_pattern('rb', 'circle', LED_BRIGHTNESS)
+            leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
+            leds.set_pattern('b', 'circle', LED_BRIGHTNESS)
             if rone.button_get_value('r'):
                 state = STATE_FIND_QUEEN
             if rone.button_get_value('b'):
