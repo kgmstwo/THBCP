@@ -115,7 +115,8 @@ def fall():
         #END OF FINITE STATE MACHINE 
 
         bump_beh_out = beh.bump_meh(MOTION_TV)
-        beh_out = beh.subsume([beh_out, bump_beh_out])
+        if (state != STATE_RETURN_TO_BASE) and (state !=STATE_COLLECT_POLLEN):
+            beh_out = beh.subsume([beh_out, bump_beh_out])
         beh.motion_set(beh_out)
         hba.set_msg(0, 0, 0)
 
