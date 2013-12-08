@@ -63,27 +63,26 @@ def spring():
                 pass
         elif state == STATE_RETURN:
             nav_tower = hba.find_nav_tower_nbr(127)
-            if state == STATE_MOVE_TO_TOWER:
-                new_nbrs = beh.update()
+            new_nbrs = beh.update()
             # Move towards the nav_tower until turning around distance reached
-                if nav_tower != None:      # move forward
-                    beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
-                    leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
+            if nav_tower != None:      # move forward
+                beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
+                leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
+            else:
+                leds.set_pattern('g', 'circle', LED_BRIGHTNESS)
+                beh_out = beh.follow_nbr(nav_tower, MOTION_TV)  
+            distance_to_go = (motion_start_odo + MOVE_TO_TOWER_DISTANCE) - pose.get_odometer()
+            beh.motion_set(beh_out)
+            if bump_sensors_get_value(1) == 1
+                if Found_Tree:
+                    state = STATE_RECRUIT
                 else:
-                    leds.set_pattern('g', 'circle', LED_BRIGHTNESS)
-                    beh_out = beh.follow_nbr(nav_tower, MOTION_TV)  
-                distance_to_go = (motion_start_odo + MOVE_TO_TOWER_DISTANCE) - pose.get_odometer()
-                beh.motion_set(beh_out)
-                if bump_sensors_get_value(1) == 1
-                    if Found_Tree:
-                        state = STATE_RECRUIT
-                    else:
-                        state = STATE_FOLLOW   
-                if distance_to_go < 0:    
-                    if Found_Tree:
-                        state = STATE_RECRUIT
-                    else:
-                        state = STATE_FOLLOW   
+                    state = STATE_FOLLOW   
+            if distance_to_go < 0:    
+                if Found_Tree:
+                    state = STATE_RECRUIT
+                else:
+                    state = STATE_FOLLOW   
             
         elif state == STATE_RECRUIT:
             pass
@@ -91,7 +90,7 @@ def spring():
             pass
         # end of the FSM
         bump_beh_out = beh.bump_beh(MOTION_TV)
-        if state != STATE_MOVE_TO_TOWER:
+        if state != STATE_RETURN:
             beh_out = beh.subsume([beh_out, bump_beh_out])
 
         # set the beh velocities
