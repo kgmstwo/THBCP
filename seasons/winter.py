@@ -97,7 +97,11 @@ def winter():
         #set the HBA message
         msg = [0, 0, 0]
         msg[MSG_POS_IN_LIGHT] = self_in_light()
+<<<<<<< HEAD
         hba.set_msg(msg,msg,msg)
+=======
+        hba.set_msg(msg, msg, msg)
+>>>>>>> 50d6531f3cfea64fe7dac56a8027867c2b50d906
 
 # Helper functions
 
