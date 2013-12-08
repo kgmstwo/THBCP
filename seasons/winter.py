@@ -114,7 +114,7 @@ def get_nbrs_in_light():
 def get_nbrs_in_dark():
     nbr_list = hba.get_robot_neighbors()
     nbrs_in_dark = []
-    new_nbrs = 1
+    new_nbrs = 0
     for nbr in nbr_list:
         in_light = hba.get_msg_from_nbr(nbr, new_nbrs)[MSG_POS_IN_LIGHT]
         if not in_light:
@@ -138,7 +138,7 @@ def get_nearest_nbr_in_dark(nbr_list):
     if len(nbrs_in_dark) > 0:
         nearest = nbrs_in_dark[0]
         for nbr in nbrs_in_dark:
-            if neigbors.get_nbr_range_bits(nbr) > neighbors.get_nbr_range_bits(nearest):
+            if neighbors.get_nbr_range_bits(nbr) > neighbors.get_nbr_range_bits(nearest):
                 nearest = nbr
     return nearest
 
