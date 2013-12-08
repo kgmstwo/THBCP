@@ -21,6 +21,9 @@ STATE_RETURN = 3
 STATE_RECRUIT = 4
 STATE_FOLLOW = 5
 
+# MSG items
+MSG_STATE = 0
+
 #global data
 Found_Tree = FALSE
 
@@ -53,9 +56,12 @@ def spring():
                 state = STATE_MOVE_TO_TREE
             #run forward, avoid same direction as neighbors
         elif state == STATE_MOVE_TO_TREE:
-            motion_start_odo = pose.get_odometer()
-            state = STATE_RETURN
-            pass
+            if not beh.bump_angle_get() == None:
+                motion_start_odo = pose.get_odometer()
+                state = STATE_RETURN
+            else:
+                #drive towards the light
+                pass
         elif state == STATE_RETURN:
             nav_tower = hba.find_nav_tower_nbr(127)
             if state == STATE_MOVE_TO_TOWER:
@@ -93,12 +99,14 @@ def spring():
         beh.motion_set(beh_out)
 
         #set the HBA message
-        hba.set_msg(0, 0, 0)
+        msg = [0, 0, 0]
+        msg[MSG_STATE] = state
+        hba.set_msg(msg)
 
 # Helper functions
 def light_diff():
     lightdiff = rone.light_sensor_get_value('fl')-rone.light_sensor_get_value('fr')
-    return lightdiff
+    return lightdiff #positive = right, negative = left
 def go_to_tree():
     diff = light_diff() - diff_start
     if diff > 50:
@@ -114,5 +122,4 @@ def go_to_tree():
 
 
 # Start!
-
 spring()

@@ -20,6 +20,9 @@ STATE_BUMP_QUEEN = 2
 STATE_RETURN = 3
 STATE_QUEEN = 4
 
+# MSG items
+MSG_STATE = 0
+
 # Other constants
 LED_BRIGHTNESS = 40
 
