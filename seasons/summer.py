@@ -96,6 +96,7 @@ def summer():
 # Helper functions
 def get_queen():
     nbr_list = hba.get_robot_neighbors()
+    new_nbrs = 0
     for nbr in nbr_list:
         is_queen = hba.get_msg_from_nbr(nbr, new_nbrs)[MSG_STATE] == STATE_QUEEN
         if is_queen:
