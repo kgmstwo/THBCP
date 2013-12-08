@@ -31,7 +31,7 @@ def spring():
     beh.init(0.22, 40, 0.5, 0.1)
 
     state = STATE_IDLE
-
+    diff_start = light_diff()
     while True:
         # run the system updates
         new_nbrs = beh.update()
@@ -73,7 +73,21 @@ def spring():
         hba.set_msg(0, 0, 0)
 
 # Helper functions
-
+def light_diff():
+    lightdiff = rone.light_sensor_get_value('fl')-rone.light_sensor_get_value('fr')
+    return lightdiff
+def go_to_tree():
+    diff = light_diff() - diff_start
+    if diff > 50:
+        rv = MOTION_RV
+        tv = 0
+    elif diff < -50:
+        rv = -MOTION_RV
+        tv = 0
+    else:
+        tv = MOTION_TV
+        rv = 0
+    return (tv,rv)
 
 
 # Start!
