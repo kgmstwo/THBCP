@@ -68,7 +68,7 @@ Notes:
 Guide never makes it to tree (seems safer)
 
 Complex Version:
-Same as before, but now we wait at the base till everyone is back.
+Samw as before, but now we wait at the base till everyone is back.
 Then we pick a leader, who heads back to a tree, and everyone flocks.
 
 Hunter says: Is there a problem with the guide simply counting bees?

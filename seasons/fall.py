@@ -45,42 +45,40 @@ def fall():
         beh_out = beh.BEH_INACTIVE
 
         #FINITE STATE MACHINE
-        if state = STATE_IDLE:
+        if state == STATE_IDLE:
             leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
             if rone.button_get_value('r'):
                 state = STATE_MOVE_TO_FLOWER
             if new_nbrs:
                 print "idle"
-        elif state = STATE_WANDER: #run forward, avoid direction of neighbors
+        elif state == STATE_WANDER: #run forward, avoid direction of neighbors
             nav_tower = hba.find_nav_tower_nbr(127)
             beh_out = beh.avoid_nbr(nav_tower, MOTION_TV) # possible state head out?
             for nbr in nbrList:
                 beh_out = beh.avoid_nbr(nbr, MOTION_TV)
-        elif state = STATE_MOVE_TO_FLOWER:
+        elif state == STATE_MOVE_TO_FLOWER:
             pass
         elif state = STATE_COLLECT_POLLEN:
             motion_start_odo = pose.get_odometer()
             state = STATE_RETURN_TO_BASE
             pass
-        elif state = STATE_RETURN_TO_BASE:
+        elif state == STATE_RETURN_TO_BASE:
             nav_tower = hba.find_nav_tower_nbr(127)
-            
-            if state == STATE_MOVE_TO_TOWER:
-                new_nbrs = beh.update()
-            # Move towards the nav_tower until turning around distance reached
-                if nav_tower != None:      # move forward
-                    beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
-                    leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
+            new_nbrs = beh.update()
+        # Move towards the nav_tower until turning around distance reached
+            if nav_tower != None:      # move forward
+                beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
+                leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
+            else:
+                leds.set_pattern('g', 'circle', LED_BRIGHTNESS)
+                beh_out = beh.follow_nbr(nav_tower, MOTION_TV)  
+            distance_to_go = (motion_start_odo + MOVE_TO_TOWER_DISTANCE) - pose.get_odometer()
+            beh.motion_set(beh_out)
+            if distance_to_go < 0:    
+                if Found_Flower:
+                    state = STATE_RETURN_TO_FLOWER
                 else:
-                    leds.set_pattern('g', 'circle', LED_BRIGHTNESS)
-                    beh_out = beh.follow_nbr(nav_tower, MOTION_TV)  
-                distance_to_go = (motion_start_odo + MOVE_TO_TOWER_DISTANCE) - pose.get_odometer()
-                beh.motion_set(beh_out)
-                if distance_to_go < 0:    
-                    if Found_Flower:
-                        state = STATE_RETURN_TO_FLOWER
-                    else:
-                        state = STATE_WANDER   
+                    state = STATE_WANDER   
         elif state = STATE_RETURN_TO_FLOWER:
             pass
         #END OF FINITE STATE MACHINE 
