@@ -40,6 +40,8 @@ def fall():
         new_nbrs = beh.update()
         
         nbrList = neighbors.get_neighbors()
+        (leader, leader_id) = hba.leaderElection_ID(nbrList, get_id())
+        
         if new_nbrs:
             print nbrList
         beh_out = beh.BEH_INACTIVE

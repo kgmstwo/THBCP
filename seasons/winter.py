@@ -37,7 +37,7 @@ def winter():
         
         nbr_list = neighbors.get_neighbors()
         if new_nbrs:
-            print nbrList
+            print nbr_list
         beh_out = beh.BEH_INACTIVE
             
         # this is the main finite-state machine
@@ -50,19 +50,19 @@ def winter():
                 print "idle"
 
         elif state == STATE_LIGHT:
-            nbr_in_dark = get_nearest_nbr_in_dark()
-            if nbr_in_dark not None:
+            nbr_in_dark = get_nearest_nbr_in_dark(nbr_list)
+            if nbr_in_dark != None:
                 bearing = neighbors.get_nbr_bearing(nbr_in_dark)
                 bearing = bearing - math.pi
                 bearing = math2.normalize_angle(bearing)
                 if bearing > BEARING_TOLERANCE:
-                    beh_out = (MOTION_TV, -MOTION_RV)
+                    beh_out = (MOTION_TV, -MOTION_RV, True)
                 elif bearing < -BEARING_TOLERANCE:
-                    beh_out = (MOTION_TV, MOTION_RV)
+                    beh_out = (MOTION_TV, MOTION_RV, True)
                 else:
-                    beh_out = (MOTION_TV, 0)
+                    beh_out = (MOTION_TV, 0, True)
             else:
-                beh_out = (0, 0)
+                beh_out = (0, 0, False)
 
             if not self_in_light():
                 state = STATE_DARK
@@ -72,13 +72,13 @@ def winter():
             if len(nbrs_in_light) > 0:
                 bearing = get_avg_bearing(nbrs_in_light)
                 if bearing > BEARING_TOLERANCE:
-                    beh_out = (MOTION_TV, -MOTION_RV)
+                    beh_out = (MOTION_TV, -MOTION_RV, True)
                 elif bearing < -BEARING_TOLERANCE:
-                    beh_out = (MOTION_TV, MOTION_RV)
+                    beh_out = (MOTION_TV, MOTION_RV, True)
                 else:
-                    beh_out = (MOTION_TV, 0)
+                    beh_out = (MOTION_TV, 0, True)
             else:
-                beh_out = (MOTION_TV, MOTION_RV)
+                beh_out = (MOTION_TV, MOTION_RV, True)
 
             if self_in_light():
                 state = STATE_LIGHT
@@ -97,13 +97,14 @@ def winter():
         #set the HBA message
         msg = [0, 0, 0]
         msg[MSG_POS_IN_LIGHT] = self_in_light()
-        hba.set_msg(msg)
+        hba.set_msg(msg,msg,msg)
 
 # Helper functions
 
 def get_nbrs_in_light():
     nbr_list = hba.get_robot_neighbors()
     nbrs_in_light = []
+    new_nbrs = 0
     for nbr in nbr_list:
         in_light = hba.get_msg_from_nbr(nbr, new_nbrs)[MSG_POS_IN_LIGHT]
         if in_light:
