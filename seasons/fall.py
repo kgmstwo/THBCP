@@ -51,9 +51,11 @@ def fall():
                 state = STATE_MOVE_TO_FLOWER
             if new_nbrs:
                 print "idle"
-        elif state = STATE_WANDER:
-            #run forward, avoid direction of neighbors
-            pass
+        elif state = STATE_WANDER: #run forward, avoid direction of neighbors
+            nav_tower = hba.find_nav_tower_nbr(127)
+            beh_out = beh.avoid_nbr(nav_tower, MOTION_TV) # possible state head out?
+            for nbr in nbrList:
+                beh_out = beh.avoid_nbr(nbr, MOTION_TV)
         elif state = STATE_MOVE_TO_FLOWER:
             pass
         elif state = STATE_COLLECT_POLLEN:
