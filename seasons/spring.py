@@ -69,12 +69,17 @@ def spring():
                     beh_out = beh.follow_nbr(nav_tower, MOTION_TV)  
                 distance_to_go = (motion_start_odo + MOVE_TO_TOWER_DISTANCE) - pose.get_odometer()
                 beh.motion_set(beh_out)
+                if bump_sensors_get_value(1) == 1
+                    if Found_Tree:
+                        state = STATE_RECRUIT
+                    else:
+                        state = STATE_FOLLOW   
                 if distance_to_go < 0:    
                     if Found_Tree:
                         state = STATE_RECRUIT
                     else:
                         state = STATE_FOLLOW   
-            pass
+            
         elif state == STATE_RECRUIT:
             pass
         elif state == STATE_FOLLOW:
