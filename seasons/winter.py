@@ -50,7 +50,11 @@ def winter():
                 print "idle"
 
         elif state == STATE_LIGHT:
+<<<<<<< HEAD
             nbr_in_dark = get_nearest_nbr_in_dark()
+=======
+            nbr_in_dark = get_nearest_nbr_in_dark(nbr_list)
+>>>>>>> 96d445d57ffa319597d0ad74a7e89cd13d1dba68
             if nbr_in_dark != None:
                 bearing = neighbors.get_nbr_bearing(nbr_in_dark)
                 bearing = bearing - math.pi
@@ -97,13 +101,18 @@ def winter():
         #set the HBA message
         msg = [0]
         msg[MSG_POS_IN_LIGHT] = self_in_light()
+<<<<<<< HEAD
         hba.set_msg(msg,msg,msg)
+=======
+        hba.set_msg(msg, msg, msg)
+>>>>>>> 96d445d57ffa319597d0ad74a7e89cd13d1dba68
 
 # Helper functions
 
 def get_nbrs_in_light():
     nbr_list = hba.get_robot_neighbors()
     nbrs_in_light = []
+    new_nbrs = 0
     for nbr in nbr_list:
         in_light = hba.get_msg_from_nbr(nbr, new_nbrs)[MSG_POS_IN_LIGHT]
         if in_light:
