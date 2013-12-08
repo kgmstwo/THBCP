@@ -57,9 +57,12 @@ def fall():
         elif state = STATE_MOVE_TO_FLOWER:
             pass
         elif state = STATE_COLLECT_POLLEN:
+            motion_start_odo = pose.get_odometer()
+            state = STATE_RETURN_TO_BASE
             pass
         elif state = STATE_RETURN_TO_BASE:
             nav_tower = hba.find_nav_tower_nbr(127)
+            
             if state == STATE_MOVE_TO_TOWER:
                 new_nbrs = beh.update()
             # Move towards the nav_tower until turning around distance reached
