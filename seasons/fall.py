@@ -20,6 +20,7 @@ STATE_MOVE_TO_FLOWER = 2
 STATE_COLLECT_POLLEN = 3
 STATE_RETURN_TO_BASE = 4
 STATE_RETURN_TO_FLOWER = 5
+STATE_RECRUIT = 6
 
 # Global Data
 Found_Flower = False
@@ -39,6 +40,7 @@ def fall():
     while True:
         new_nbrs = beh.update()
         nbrList = neighbors.get_neighbors()
+        (leader, leader_id) = leaderElection_ID(nbrList, rone.get_id())
         
         if new_nbrs:
             print nbrList
@@ -49,7 +51,8 @@ def fall():
             leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
             if rone.button_get_value('r'):
                 state = STATE_MOVE_TO_FLOWER
-            if rone.button_get_value('b') # for the robee that stays at the nav tower
+            if rone.get_id() == leader_id: # for the robee that stays at the nav tower
+                                          # (that's you Chris)
                 while True
                 hba.set_msg(0,0,'queen')
             if new_nbrs:
@@ -95,6 +98,8 @@ def fall():
             if nav_tower != None:      # move forward
                 beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
                 leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
+                if get_nbr_range_bits(leader) < 3:
+                    state == STATE_RECRUIT
             else:
                 leds.set_pattern('g', 'circle', LED_BRIGHTNESS)
                 beh_out = beh.follow_nbr(nav_tower, MOTION_TV)  
