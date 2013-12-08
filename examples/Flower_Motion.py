@@ -135,6 +135,7 @@ def nbrList_getRobotWithID(nbrList, nbrID):
 
 def detflower(nbrList):
     for nbr in nbrList:
+        color = None
         (unimportant, stuff, colormsg) = hba.get_msg_from_nbr(nbr,0)
         if colormsg == 0:
             color = 'red'
