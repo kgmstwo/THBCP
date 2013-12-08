@@ -52,7 +52,7 @@ def summer():
                 print "idle"
         elif state == STATE_FIND_QUEEN:
             leds.set_pattern('r', 'ramp_slow', LED_BRIGHTNESS)
-            beh_out = (MOTION_TV, 0)
+            beh_out = (MOTION_TV, 0, True)
             queen = get_queen()
             if not queen == None:
                 state = STATE_BUMP_QUEEN
@@ -60,7 +60,7 @@ def summer():
                 #go straight and hope for the best
                 beh_out = beh.tvrv(MOTION_TV, MOTION_RV)
         elif state == STATE_BUMP_QUEEN:
-            leds.set_pattern('r', 'ramp_fast', LED_BRIGHTNESS)
+            leds.set_pattern('r', 'ramp_slow', LED_BRIGHTNESS)
             queen = get_queen()
             if queen == None:
                 state = STATE_RETURN
