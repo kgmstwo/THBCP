@@ -53,7 +53,8 @@ def spring():
                 state = STATE_MOVE_TO_TREE
             #run forward, avoid same direction as neighbors
         elif state == STATE_MOVE_TO_TREE:
-
+            motion_start_odo = pose.get_odometer()
+            state = STATE_RETURN
             pass
         elif state == STATE_RETURN:
             nav_tower = hba.find_nav_tower_nbr(127)
