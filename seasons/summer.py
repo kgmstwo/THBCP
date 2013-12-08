@@ -24,6 +24,7 @@ STATE_QUEEN = 4
 MSG_STATE = 0
 
 # Other constants
+BACK_UP_TIME = 750 #milliseconds
 LED_BRIGHTNESS = 40
 
 def summer():
@@ -66,14 +67,19 @@ def summer():
                 state = STATE_RETURN
             else:
                 if (neighbors.get_nbr_range_bits(queen) > 6) or (beh.bump_angle_get() != None):
-                    state = STATE_RETURN
+                    state = STATE_BACK_UP
+                    start_time = sys.time()
                 else:
                     beh_out = beh.follow_nbr(queen, MOTION_TV)
+        elif state == STATE_BACK_UP:
+            if sys.time() > start_time + BACK_UP_TIME:
+                state = STATE_RETURN
+            else:
+                beh_out = beh.tvrv(-MOTION_TV, 0)
         elif state == STATE_RETURN:
             leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
             if rone.button_get_value('r'):
                 state = STATE_FIND_QUEEN
-
             queen = get_queen()
             if queen == None:
                 state = STATE_IDLE
@@ -81,7 +87,7 @@ def summer():
                 beh_out = beh.avoid_nbr(queen, MOTION_TV)
         elif state == STATE_QUEEN:
             if new_nbrs:
-                print 'Ich bin die Koenigin!'
+                print 'Ich bin die Koenigin der welt!'
 
         # end of the FSM
         bump_beh_out = beh.bump_beh(MOTION_TV)
