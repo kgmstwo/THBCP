@@ -51,6 +51,7 @@ def spring():
                 print "idle"
         elif state == STATE_WANDER:
             if tree_detect(diff_start) == True:
+                Found_Tree = True
                 state = STATE_MOVE_TO_TREE
             else:
                 for nbr in nbrList:
@@ -77,19 +78,21 @@ def spring():
             distance_to_go = (motion_start_odo + MOVE_TO_TOWER_DISTANCE) - pose.get_odometer()
             beh.motion_set(beh_out)
             if rone.bump_sensors_get_value(1) == 1:
-                if Found_Tree:
+                if Found_Tree == True:
                     state = STATE_RECRUIT
                 else:
                     state = STATE_FOLLOW   
             if distance_to_go < 0:    
-                if Found_Tree:
+                if Found_Tree == True:
                     state = STATE_RECRUIT
                 else:
                     state = STATE_FOLLOW   
             
         elif state == STATE_RECRUIT:
-            for nbr in nbrList:
+            for nbr in hba.get_robot_neighbors():
                 msg = neighbors.get_nbr_message(nbr)
+                print type(msg)
+                print msg
                 if 'LEADER' in msg:
                     state = STATE_FOLLOW
                 else:
