@@ -21,10 +21,11 @@ STATE_RECRUIT = 4
 STATE_FOLLOW = 5
 
 #global data
-Found_Tree = FALSE
+Found_Tree = False
 
 # Other constants
 LED_BRIGHTNESS = 40
+MOVE_TO_TOWER_DISTANCE = 3000
 
 def spring():
     beh.init(0.22, 40, 0.5, 0.1)
@@ -58,9 +59,8 @@ def spring():
                 motion_start_odo = pose.get_odometer()
                 state = STATE_RETURN
             else:
-                (tv, rv) = go_to_tree()
+                (tv, rv) = go_to_tree(diff_start)
                 beh_out = beh.tvrv(tv, rv)
-                pass
         elif state == STATE_RETURN:
             nav_tower = hba.find_nav_tower_nbr(127)
             new_nbrs = beh.update()
@@ -73,7 +73,7 @@ def spring():
                 beh_out = beh.follow_nbr(nav_tower, MOTION_TV)  
             distance_to_go = (motion_start_odo + MOVE_TO_TOWER_DISTANCE) - pose.get_odometer()
             beh.motion_set(beh_out)
-            if bump_sensors_get_value(1) == 1
+            if rone.bump_sensors_get_value(1) == 1:
                 if Found_Tree:
                     state = STATE_RECRUIT
                 else:
@@ -85,9 +85,16 @@ def spring():
                     state = STATE_FOLLOW   
             
         elif state == STATE_RECRUIT:
-            pass
+            for nbr in nbrList:
+                msg = neighbors.get_nbr_message(nbr)
+                if 'LEADER' in msg:
+                    state = STATE_FOLLOW
+                else:
+                    neighbors.set_message('LEADER')
+                    
         elif state == STATE_FOLLOW:
             pass
+        
         # end of the FSM
         bump_beh_out = beh.bump_beh(MOTION_TV)
         if state != STATE_RETURN:
@@ -104,10 +111,7 @@ def light_diff():
     lightdiff = rone.light_sensor_get_value('fl')-rone.light_sensor_get_value('fr')
     return lightdiff #positive = right, negative = left
 
-def light_diff():
-    return rone.light_sensor_get_value('fl')+rone.light_sensor_get_value('fr')
-
-def go_to_tree():
+def go_to_tree(diff_start):
     diff = light_diff() - diff_start
     if diff > 50:
         rv = MOTION_RV
@@ -120,6 +124,12 @@ def go_to_tree():
         rv = 0
     return (tv,rv)
 
+def tree_detect():
+    tree = False
+    light = light_diff()
+    if light > 50:
+        tree = True
+    return tree
 
 # Start!
 spring()
