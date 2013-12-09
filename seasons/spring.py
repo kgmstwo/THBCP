@@ -53,8 +53,9 @@ def spring():
             if tree_detect(diff_start) == True:
                 state = STATE_MOVE_TO_TREE
             else:
-                #right now just runs forward and sideways, get fancy?
-                beh_out = beh.tvrv(MOTION_TV, MOTION_RV)
+                for nbr in nbrList:
+                    beh_out = beh.avoid_nbr(nbr, MOTION_TV)
+##                beh_out = beh.tvrv(MOTION_TV, MOTION_RV)
         elif state == STATE_MOVE_TO_TREE:
             if not beh.bump_angle_get() == None:
                 motion_start_odo = pose.get_odometer()
@@ -94,9 +95,12 @@ def spring():
                     neighbors.set_message('LEADER')
                     
         elif state == STATE_FOLLOW: 
-            
-            nbr_bearing = neighbors.get_nbr_bearing(nbr)
-            nbr_orientation = neighbors.get_nbr_orientation(nbr)
+            for nbr in nbrList:
+                msg = neighbors.get_nbr_message(nbr)
+                if 'LEADER' in msg:
+                    nbr = LEADER
+            nbr_bearing = neighbors.get_nbr_bearing(LEADER)
+            nbr_orientation = neighbors.get_nbr_orientation(LEADER)
             nbr_heading = math2.normalize_angle(math.pi + nbr_bearing - nbr_orientation) + math.pi 
             
             if nbr_heading > 2: 
