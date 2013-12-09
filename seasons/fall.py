@@ -14,16 +14,20 @@ MOTION_RV = int(1000 * math.pi * 0.3)
 MOTION_TV = 100
 
 # FSM States
-STATE_IDLE = 0
-STATE_WANDER = 1
-STATE_MOVE_TO_FLOWER = 2
-STATE_COLLECT_POLLEN = 3
-STATE_RETURN_TO_BASE = 4
-STATE_RETURN_TO_FLOWER = 5
-STATE_RECRUIT = 6
+STATE_FLOWER = 0 # don't actually use this
+STATE_IDLE = 1
+STATE_WANDER = 2
+STATE_MOVE_TO_FLOWER = 3
+STATE_COLLECT_POLLEN = 4
+STATE_RETURN_TO_BASE = 5
+STATE_RETURN_TO_FLOWER = 6
+STATE_RECRUIT = 7
 
 # Global Data
 Found_Flower = False
+
+# MSG items
+MSG_STATE = 0
 
 # Other constants
 LED_BRIGHTNESS = 40
@@ -118,7 +122,7 @@ def fall():
         if (state != STATE_RETURN_TO_BASE) or (state !=STATE_COLLECT_POLLEN):
             beh_out = beh.subsume([beh_out, bump_beh_out])
         beh.motion_set(beh_out)
-        hba.set_msg(0, 0, 0)
+        hba.set_msg(state, 0, 0)
 
 def detflower(nbrList):
     for nbr in nbrList:
