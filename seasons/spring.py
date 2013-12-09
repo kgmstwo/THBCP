@@ -49,10 +49,10 @@ def spring():
             if new_nbrs:
                 print "idle"
         elif state == STATE_WANDER:
-            if tree_detect():
+            if tree_detect() == True:
                 state = STATE_MOVE_TO_TREE
             else:
-                #right now just runs forward, get fancy?
+                #right now just runs forward and sideways, get fancy?
                 beh_out = beh.tvrv(MOTION_TV, MOTION_RV)
         elif state == STATE_MOVE_TO_TREE:
             if not beh.bump_angle_get() == None:
@@ -126,9 +126,13 @@ def go_to_tree(diff_start):
 
 def tree_detect():
     tree = False
-    light = light_diff()
+    light = light_diff() - diff_start
     if light > 50:
         tree = True
+    elif light < -50:
+        tree = True
+    else:
+        tree = False
     return tree
 
 # Start!
