@@ -24,7 +24,7 @@ MSG_POS_STATE = 0
 
 # Other constants
 LED_BRIGHTNESS = 40
-CLOSENESS_CONSTANT = 5
+CLOSENESS_CONSTANT = 4
 BRIGHTNESS_CONSTANTS = {'fl':300, 'fr':300, 'r':300}
 
 def winter():
