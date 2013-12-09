@@ -82,13 +82,12 @@ def fall():
                 # Stop if we get close or bump into the flower
             (color,nbr) = detflower(nbrList)
             flower = nbr
-            if flower != None and color == 'blue':                
-                if (neighbors.get_nbr_range_bits(flower) > 6) or (beh.bump_angle_get() != None):
-                    state = STATE_COLLECT_POLLEN
-                    collect_pollen_start_time = sys.time()
-                else:
-                    # Move to the flower
-                    beh_out = beh.follow_nbr(flower, MOTION_TV)
+            if (neighbors.get_nbr_range_bits(flower) > 6) or (beh.bump_angle_get() != None):
+                state = STATE_COLLECT_POLLEN
+                collect_pollen_start_time = sys.time()
+            else:
+                # Move to the flower
+                beh_out = beh.follow_nbr(flower, MOTION_TV)
                     
         elif state == STATE_COLLECT_POLLEN:
             motion_start_odo = pose.get_odometer()
