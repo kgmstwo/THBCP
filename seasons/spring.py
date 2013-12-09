@@ -20,8 +20,6 @@ STATE_RETURN = 3
 STATE_RECRUIT = 4
 STATE_FOLLOW = 5
 
-#global data
-Found_Tree = False
 
 # Other constants
 LED_BRIGHTNESS = 40
@@ -29,6 +27,8 @@ MOVE_TO_TOWER_DISTANCE = 3000
 
 
 def spring():
+    Found_Tree = False
+
     beh.init(0.22, 40, 0.5, 0.1)
 
     state = STATE_IDLE
@@ -65,7 +65,6 @@ def spring():
                 beh_out = beh.tvrv(tv, rv)
         elif state == STATE_RETURN:
             nav_tower = hba.find_nav_tower_nbr(125)
-            new_nbrs = beh.update()
             # Move towards the nav_tower until turning around distance reached
             if nav_tower != None:      # move forward
                 beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
