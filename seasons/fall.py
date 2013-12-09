@@ -138,11 +138,10 @@ def fall():
                     state = STATE_WANDER
 
         elif state == STATE_RETURN_TO_FLOWER:
-            ##            nbr_list = hba.get_robot_neighbors()
-##            for nbr in nbr_list:
-##                (0,0,msg) = hba.get_msg_from_nbr(nbr,new_nbrs)
-##                if msg == 10:
-            pass
+            nbr_list = hba.get_robot_neighbors()
+            for nbr in nbr_list:
+                state = hba.get_msg_from_nbr(nbr,new_nbrs)[MSG_STATE]
+                if msg == 10:
         elif state == STATE_RECRUIT:
             if sys.time() > (rec_time + RECRUIT_TIME):
                 state = STATE_WANDER
