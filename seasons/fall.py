@@ -22,6 +22,7 @@ STATE_COLLECT_POLLEN = 4
 STATE_RETURN_TO_BASE = 5
 STATE_RETURN_TO_FLOWER = 6
 STATE_RECRUIT = 7
+STATE_QUEEN = 8
 
 # Global Data
 Found_Flower = False
@@ -32,11 +33,13 @@ MSG_STATE = 0
 # Other constants
 LED_BRIGHTNESS = 40
 COLLECT_POLLEN_TIME = 3000
+
 #these are the time to wait at base before heading out again
 RECRUIT_TIME = 10 * 1000
 FOLLOW_TIME = 10 * 1000
 BACK_UP_TIME = 1000
 TURN_TIME = 1700
+
 queen_id = 17
 
 def fall(): 
@@ -50,21 +53,19 @@ def fall():
         if new_nbrs:
             print nbrList
         beh_out = beh.BEH_INACTIVE
-        for nbr in nbrList:
-            if queen_id in nbr:
-                queen = nbr
+
+
         #FINITE STATE MACHINE
         if state == STATE_IDLE:
             leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
             if rone.button_get_value('r'):
                 state = STATE_MOVE_TO_FLOWER
             if rone.get_id() == queen_id: # for the robee that stays at the nav tower
-                                          # (that's you Timothy)
-                while True:
-                    hba.set_msg(0,0,100) # 100 = queen
+                # (that's you Timothy)
+                state = STATE_QUEEN
             if new_nbrs:
                 print "idle"
-                
+
         elif state == STATE_WANDER: #run forward, avoid direction of neighbors
             nav_tower = hba.find_nav_tower_nbr(127)
             beh_out = beh.avoid_nbr(nav_tower, MOTION_TV) # possible state head out?
@@ -75,7 +76,7 @@ def fall():
                 flower = nbr
             if flower != None and color == 'blue': # CHANGE THIS COLOR TO WHATEVER
                 state = STATE_MOVE_TO_FLOWER
-                
+
         elif state == STATE_MOVE_TO_FLOWER:
             leds.set_pattern('b', 'ramp_slow', LED_BRIGHTNESS)
                 # Stop if we get close or bump into the flower
@@ -87,42 +88,41 @@ def fall():
             else:
                 # Move to the flower
                 beh_out = beh.follow_nbr(flower, MOTION_TV)
-                    
+
         elif state == STATE_COLLECT_POLLEN:
             motion_start_odo = pose.get_odometer()
             if sys.time() > (collect_pollen_start_time + COLLECT_POLLEN_TIME):
                 state = STATE_RETURN_TO_BASE
                 Found_Flower = True
-                hba.set_msg(0,0,10) # guys look i'm a recruiter
+                #hba.set_msg(0,0,10) # guys look i'm a recruiter
             elif sys.time() < (collect_pollen_start_time + BACK_UP_TIME):    
                 tv = -MOTION_TV
                 rv = 0
                 beh_out = beh.tvrv(tv,rv) 
                 turn_start_time = (collect_pollen_start_time + BACK_UP_TIME)
-                
+
             elif sys.time() < (turn_start_time + TURN_TIME): 
                 tv = 40
                 rv = -MOTION_RV
                 beh_out = beh.tvrv(tv,rv)
-            
+
             else: 
                 tv = MOTION_TV
                 rv = (MOTION_RV - 300)
                 beh_out = beh.tvrv(tv,rv)
-        
+
         elif state == STATE_RETURN_TO_BASE:
             nav_tower = hba.find_nav_tower_nbr(127)
+            queen = find_queen()
             new_nbrs = beh.update()
-        # Move towards the nav_tower until turning around distance reached
-            if nav_tower != None:      # move forward
-                for nbr in nbrList:
-                    (unimportant,stuff,msg) = hba.get_msg_from_nbr(nbr,new_nbrs)
-                    if get_nbr_range_bits(queen) > 2:
-                        beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
+            # Move towards the nav_tower until turning around distance reached
+            if not nav_tower == None:      # move forward
+                if not queen == None:
+                    if get_nbr_range_bits(queen) > 2: beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
                         leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
-                    elif get_nbr_range_bits(queen) < 2 and Found_Flower and msg == 10:
+                    elif get_nbr_range_bits(queen) < 2 and Found_Flower
                         state = STATE_RETURN_TO_FLOWER                        
-                    elif get_nbr_range_bits(queen) < 2 and Found_Flower and hba.set_msg(0,0,10):
+                    elif get_nbr_range_bits(queen) < 2 and Found_Flower:
                         state = STATE_RECRUIT
                         rec_time = sys.time()
                     else:
@@ -136,23 +136,17 @@ def fall():
                     state = STATE_RETURN_TO_FLOWER
                 else:
                     state = STATE_WANDER
-                    
+
         elif state == STATE_RETURN_TO_FLOWER:
-##            nbr_list = hba.get_robot_neighbors()
+            ##            nbr_list = hba.get_robot_neighbors()
 ##            for nbr in nbr_list:
 ##                (0,0,msg) = hba.get_msg_from_nbr(nbr,new_nbrs)
 ##                if msg == 10:
-            
-                    
             pass
         elif state == STATE_RECRUIT:
             if sys.time() > (rec_time + RECRUIT_TIME):
-                hba.set_msg(0,0,10) # guys look i'm recruiting
-            else:
                 state = STATE_WANDER
-                
-                
-        
+
         #END OF FINITE STATE MACHINE 
 
         bump_beh_out = beh.bump_beh(MOTION_TV)
@@ -161,17 +155,23 @@ def fall():
         beh.motion_set(beh_out)
         hba.set_msg(state, 0, 0)
 
+def find_queen():
+    for nbr in nbrList:
+        if neighbors.get_nbr_id(nbr):
+            return nbr
+    return None
+
 def detflower(nbrList):
     for nbr in nbrList:
         color = None
-        (unimportant, stuff, colormsg) = hba.get_msg_from_nbr(nbr,0)
-        if colormsg == 0:
-            color = 'red'
-        elif colormsg == 1:
-            color = 'green'
-        elif colormsg == 2:
-            color = 'blue'
-        if color != None:
+        (state, unimportant, colormsg) = hba.get_msg_from_nbr(nbr,0)
+        if state == STATE_FLOWER:
+            if colormsg == 0:
+                color = 'red'
+            elif colormsg == 1:
+                color = 'green'
+            elif colormsg == 2:
+                color = 'blue'
             return (color, nbr)
     return (None, None)
 
