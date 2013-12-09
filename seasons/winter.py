@@ -76,7 +76,7 @@ def winter():
         elif state == STATE_DARK:
             nbrs_in_light = get_nbrs_in_light()
             if len(nbrs_in_light) > 0:
-                bearing = get_avg_bearing(nbrs_in_light)
+                bearing = get_avg_bearing_to_nbrs(nbrs_in_light)
                 beh_out = move_in_dir(bearing)
             else:
                 beh_out = (MOTION_TV, MOTION_RV, True)
@@ -98,13 +98,16 @@ def winter():
 
         #set the HBA message
         msg = [0, 0, 0]
-        msg[MSG_POS_IN_LIGHT] = self_in_light()
-        in_light = self_in_light()
-        hba.set_msg(in_light, 0, 0)
+        if self_in_light():
+            msg[MSG_POS_IN_LIGHT] = 1
+        else:
+            msg[MSG_POS_IN_LIGHT] = 0
+        hba.set_msg(msg[0], msg[1], msg[2])
 
 # Helper functions
 
 def get_nbrs_in_light():
+    new_nbrs = 0
     nbr_list = hba.get_robot_neighbors()
     nbrs_in_light = []
     for nbr in nbr_list:
@@ -114,6 +117,7 @@ def get_nbrs_in_light():
     return nbrs_in_light
 
 def get_nbrs_in_dark():
+    new_nbrs = 0
     nbr_list = hba.get_robot_neighbors()
     nbrs_in_dark = []
     for nbr in nbr_list:
@@ -141,8 +145,8 @@ def get_near_nbr_in_dark(nbr_list):
         for nbr in nbrs_in_dark:
             if neighbors.get_nbr_range_bits(nbr) > neighbors.get_nbr_range_bits(nearest):
                 nearest = nbr
-    if neighbors.get_nbr_range_bits(nearest) < CLOSENESS_CONSTANT:
-        nearest = None
+        if neighbors.get_nbr_range_bits(nearest) < CLOSENESS_CONSTANT:
+            nearest = None
     return nearest
 
 def move_in_dir(bearing):

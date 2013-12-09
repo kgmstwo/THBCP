@@ -59,7 +59,7 @@ def summer():
                 state = STATE_BUMP_QUEEN
             else:
                 #go straight and hope for the best
-                beh_out = beh.tvrv(MOTION_TV, MOTION_RV)
+                beh_out = beh.tvrv(MOTION_TV, 0)  
         elif state == STATE_BUMP_QUEEN:
             leds.set_pattern('r', 'ramp_slow', LED_BRIGHTNESS)
             queen = get_queen()
@@ -91,7 +91,7 @@ def summer():
 
         # end of the FSM
         bump_beh_out = beh.bump_beh(MOTION_TV)
-        if not state == STATE_QUEEN
+        if not state == STATE_QUEEN:
             beh_out = beh.subsume([beh_out, bump_beh_out])
 
         # set the beh velocities

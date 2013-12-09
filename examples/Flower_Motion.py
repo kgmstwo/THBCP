@@ -1,4 +1,14 @@
-import rone, sys, math, math2, velocity, pose, motion, leds, neighbors, beh, hba
+import rone
+import sys
+import math 
+import math2 
+import velocity 
+import pose 
+import motion 
+import leds 
+import neighbors 
+import beh 
+import hba
 
 ###########################################################
 ##
@@ -24,8 +34,8 @@ STATE_MOVE_AWAY_FLOWER = 4
 # Other constants
 LED_BRIGHTNESS = 40
 COLLECT_POLLEN_TIME = 15000
-TURN_TIME = 500
-
+BACK_UP_TIME = 1000
+TURN_TIME = 1000
 
 
 def flower_motion():
@@ -57,10 +67,10 @@ def flower_motion():
            
             # Move towards the flower until you bump into it
             # for this demo, assume the first robot on the list is a flower
-            flower = nbrList_getFirstRobot(nbrList)
+##            flower = nbrList_getFirstRobot(nbrList)
             (color,nbr) = detflower(nbrList)
             flower = nbr
-            if flower != None and color == 'blue':
+            if flower != None:
                 # Stop if we get close or bump into the flower
                 #if neighbors.get_nbr_close_range(flower):
                 if (neighbors.get_nbr_range_bits(flower) > 6) or (beh.bump_angle_get() != None):
@@ -82,10 +92,15 @@ def flower_motion():
             if sys.time() > (collect_pollen_start_time + COLLECT_POLLEN_TIME):
                 state = STATE_MOVE_AWAY_FLOWER
             
-            elif sys.time() < (collect_pollen_start_time + TURN_TIME):    
-                tv = 0
-                rv = 60
+            elif sys.time() < (collect_pollen_start_time + BACK_UP_TIME):    
+                tv = -MOTION_TV
+                rv = 0
                 beh_out = beh.tvrv(tv,rv) 
+                turn_start_time = (collect_pollen_start_time + BACK_UP_TIME)
+                
+            elif sys.time() < (turn_start_time + TURN_TIME): 
+                tv = 0
+                rv = -MOTION_RV
             
             else: 
                 tv = MOTION_TV
@@ -110,7 +125,8 @@ def flower_motion():
         # end of the FSM
         bump_beh_out = beh.bump_beh(MOTION_TV)
 
-        beh_out = beh.subsume([beh_out, bump_beh_out])
+        if state != STATE_COLLECT_POLLEN:
+            beh_out = beh.subsume([beh_out, bump_beh_out])
 
         # set the beh velocities
         beh.motion_set(beh_out)
@@ -135,7 +151,6 @@ def nbrList_getRobotWithID(nbrList, nbrID):
 
 def detflower(nbrList):
     for nbr in nbrList:
-        color = None
         (unimportant, stuff, colormsg) = hba.get_msg_from_nbr(nbr,0)
         if colormsg == 0:
             color = 'red'
