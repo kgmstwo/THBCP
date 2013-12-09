@@ -50,7 +50,7 @@ def spring():
             if new_nbrs:
                 print "idle"
         elif state == STATE_WANDER:
-            if tree_detect() == True:
+            if tree_detect(diff_start) == True:
                 state = STATE_MOVE_TO_TREE
             else:
                 #right now just runs forward and sideways, get fancy?
