@@ -32,11 +32,11 @@ def spring():
     beh.init(0.22, 40, 0.5, 0.1)
 
     state = STATE_IDLE
-    diff_start = light_diff()
+    
     while True:
         # run the system updates
         new_nbrs = beh.update()
-        
+        diff_start = light_diff()
         nbrList = neighbors.get_neighbors()
         if new_nbrs:
             print nbrList
@@ -63,7 +63,7 @@ def spring():
                 (tv, rv) = go_to_tree(diff_start)
                 beh_out = beh.tvrv(tv, rv)
         elif state == STATE_RETURN:
-            nav_tower = hba.find_nav_tower_nbr(127)
+            nav_tower = hba.find_nav_tower_nbr(125)
             new_nbrs = beh.update()
             # Move towards the nav_tower until turning around distance reached
             if nav_tower != None:      # move forward
