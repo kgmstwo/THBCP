@@ -24,7 +24,7 @@ STATE_FOLLOW = 5
 # Other constants
 LED_BRIGHTNESS = 40
 MOVE_TO_TOWER_DISTANCE = 3000
-
+WANDER = 3000
 
 def spring():
     Found_Tree = False
@@ -49,9 +49,12 @@ def spring():
                 state = STATE_WANDER
             if new_nbrs:
                 print "idle"
+                
         elif state == STATE_WANDER:
             if tree_detect(diff_start) == True:
                 Found_Tree = True
+                state = STATE_RETURN
+            elif pose.get_odometer() > WANDER:
                 state = STATE_RETURN
             else:
                 nav = hba.find_nav_tower_nbr(125)
