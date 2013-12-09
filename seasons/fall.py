@@ -50,6 +50,10 @@ def fall():
     def collect_pollen():
         state = STATE_COLLECT_POLLEN
         collect_pollen_start_time = sys.time()
+    def follow():
+        state = STATE_RETURN_TO_FLOWER
+    def recruit():
+        state = STATE_RECRUIT
 
     beh.init(0.22, 40, 0.5, 0.1)
     state = STATE_IDLE
@@ -118,28 +122,21 @@ def fall():
 
         elif state == STATE_RETURN_TO_BASE:
             nav_tower = hba.find_nav_tower_nbr(127)
-            queen = find_queen()
+            queen = find_queen(nbrList)
             new_nbrs = beh.update()
             if nav_tower == None:
-                #we're in trouble
-                wander()
-                pass
+                wander() #we're in trouble
             else:
                 if queen == None:
-                    #just follow the nav tower
-                    beh_out = beh.follow_nbr(nav_tower)
+                    beh_out = beh.follow_nbr(nav_tower) #just follow the nav tower
                 else:
                     if get_nbr_range_bits(queen) > 2:
-                        #get closer to the queen
-                        beh_out = beh.follow_nbr(nav_tower, MOTION_TV):
+                        beh_out = beh.follow_nbr(nav_tower, MOTION_TV): #get closer to the queen
                     else:
                         if Found_Flower:
-                            #recruit for a while, then return to flower
-                            state = STATE_RETURN_TO_FLOWER                        
+                            recruit()
                         else:
-                            #wait for a leader, then wander
-                            state = STATE_RECRUIT
-                            rec_time = sys.time()
+                            follow()
 
         elif state == STATE_RETURN_TO_FLOWER:
             nbr_list = hba.get_robot_neighbors()
@@ -159,7 +156,7 @@ def fall():
         beh.motion_set(beh_out)
         hba.set_msg(state, 0, 0)
 
-def find_queen():
+def find_queen(nbrList):
     for nbr in nbrList:
         if neighbors.get_nbr_id(nbr):
             return nbr
