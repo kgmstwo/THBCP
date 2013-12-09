@@ -47,9 +47,7 @@ def fall():
 
     while True:
         new_nbrs = beh.update()
-        nbrList = neighbors.get_neighbors()
-        (leader, leader_id) = leaderElection_ID(nbrList, rone.get_id())
-        
+        nbrList = neighbors.get_neighbors()       
         if new_nbrs:
             print nbrList
         beh_out = beh.BEH_INACTIVE
@@ -82,14 +80,17 @@ def fall():
         elif state == STATE_MOVE_TO_FLOWER:
             leds.set_pattern('b', 'ramp_slow', LED_BRIGHTNESS)
                 # Stop if we get close or bump into the flower
-            if (neighbors.get_nbr_range_bits(flower) > 6) or (beh.bump_angle_get() != None):
-                state = STATE_COLLECT_POLLEN
-                collect_pollen_start_time = sys.time()
-            else:
-                # Move to the flower
-                beh_out = beh.follow_nbr(flower, MOTION_TV)
+            (color,nbr) = detflower(nbrList)
+            flower = nbr
+            if flower != None and color == 'blue':                
+                if (neighbors.get_nbr_range_bits(flower) > 6) or (beh.bump_angle_get() != None):
+                    state = STATE_COLLECT_POLLEN
+                    collect_pollen_start_time = sys.time()
+                else:
+                    # Move to the flower
+                    beh_out = beh.follow_nbr(flower, MOTION_TV)
                     
-        elif state = STATE_COLLECT_POLLEN:
+        elif state == STATE_COLLECT_POLLEN:
             motion_start_odo = pose.get_odometer()
             if sys.time() > (collect_pollen_start_time + COLLECT_POLLEN_TIME):
                 state = STATE_RETURN_TO_BASE
@@ -117,7 +118,7 @@ def fall():
         # Move towards the nav_tower until turning around distance reached
             if nav_tower != None:      # move forward
                 for nbr in nbrList:
-                    (0,0,msg) = hba.get_msg_from_nbr(nbr,new_nbrs)
+                    (unimportant,stuff,msg) = hba.get_msg_from_nbr(nbr,new_nbrs)
                     if get_nbr_range_bits(queen) > 2:
                         beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
                         leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
@@ -145,7 +146,7 @@ def fall():
 ##                if msg == 10:
             
                     
-        
+            pass
         elif state == STATE_RECRUIT:
             if sys.time() > (rec_time + RECRUIT_TIME):
                 hba.set_msg(0,0,10) # guys look i'm recruiting
@@ -156,7 +157,7 @@ def fall():
         
         #END OF FINITE STATE MACHINE 
 
-        bump_beh_out = beh.bump_meh(MOTION_TV)
+        bump_beh_out = beh.bump_beh(MOTION_TV)
         if (state != STATE_RETURN_TO_BASE) or (state !=STATE_COLLECT_POLLEN):
             beh_out = beh.subsume([beh_out, bump_beh_out])
         beh.motion_set(beh_out)
