@@ -65,20 +65,21 @@ def fall():
             beh_out = beh.avoid_nbr(nav_tower, MOTION_TV) # possible state head out?
             for nbr in nbrList:
                 beh_out = beh.avoid_nbr(nbr, MOTION_TV)
-                
-        elif state == STATE_MOVE_TO_FLOWER:
-            leds.set_pattern('b', 'ramp_slow', LED_BRIGHTNESS)
             if new_nbrs:
                 (color,nbr) = detflower(nbrList)
                 flower = nbr
             if flower != None and color == 'blue': # CHANGE THIS COLOR TO WHATEVER
+                state = STATE_MOVE_TO_FLOWER
+                
+        elif state == STATE_MOVE_TO_FLOWER:
+            leds.set_pattern('b', 'ramp_slow', LED_BRIGHTNESS)
                 # Stop if we get close or bump into the flower
-                if (neighbors.get_nbr_range_bits(flower) > 6) or (beh.bump_angle_get() != None):
-                    state = STATE_COLLECT_POLLEN
-                    collect_pollen_start_time = sys.time()
-                else:
-                    # Move to the flower
-                    beh_out = beh.follow_nbr(flower, MOTION_TV)
+            if (neighbors.get_nbr_range_bits(flower) > 6) or (beh.bump_angle_get() != None):
+                state = STATE_COLLECT_POLLEN
+                collect_pollen_start_time = sys.time()
+            else:
+                # Move to the flower
+                beh_out = beh.follow_nbr(flower, MOTION_TV)
                     
         elif state = STATE_COLLECT_POLLEN:
             motion_start_odo = pose.get_odometer()
@@ -119,9 +120,14 @@ def fall():
                 if Found_Flower:
                     state = STATE_RETURN_TO_FLOWER
                 else:
-                    state = STATE_WANDER   
-        elif state = STATE_RETURN_TO_FLOWER:
+                    state = STATE_WANDER
+                    
+        elif state == STATE_RETURN_TO_FLOWER:
             pass
+        
+        elif state == STATE_RECRUIT:
+            pass
+        
         #END OF FINITE STATE MACHINE 
 
         bump_beh_out = beh.bump_meh(MOTION_TV)
