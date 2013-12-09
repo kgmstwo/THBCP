@@ -137,7 +137,7 @@ def go_to_tree(diff_start):
         rv = 0
     return (tv,rv)
 
-def tree_detect():
+def tree_detect(diff_start):
     tree = False
     light = light_diff() - diff_start
     if light > 50:
