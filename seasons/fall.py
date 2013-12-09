@@ -37,7 +37,7 @@ RECRUIT_TIME = 10 * 1000
 FOLLOW_TIME = 10 * 1000
 BACK_UP_TIME = 1000
 TURN_TIME = 1700
-
+queen_id = 17
 #Tim is sorry
 
 def fall(): 
@@ -52,14 +52,14 @@ def fall():
             print nbrList
         beh_out = beh.BEH_INACTIVE
         for nbr in nbrList:
-            if 14 in nbr:
+            if queen_id in nbr:
                 queen = nbr
         #FINITE STATE MACHINE
         if state == STATE_IDLE:
             leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
             if rone.button_get_value('r'):
                 state = STATE_MOVE_TO_FLOWER
-            if rone.get_id() == 14: # for the robee that stays at the nav tower
+            if rone.get_id() == queen_id: # for the robee that stays at the nav tower
                                           # (that's you Timothy)
                 while True:
                     hba.set_msg(0,0,100) # 100 = queen
