@@ -53,16 +53,18 @@ def fall():
         if new_nbrs:
             print nbrList
         beh_out = beh.BEH_INACTIVE
-
+        for nbr in nbrList:
+            if 14 in nbr:
+                queen = nbr
         #FINITE STATE MACHINE
         if state == STATE_IDLE:
             leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
             if rone.button_get_value('r'):
                 state = STATE_MOVE_TO_FLOWER
-            if rone.get_id() == leader_id: # for the robee that stays at the nav tower
-                                          # (that's you Chris)
-                while True
-                hba.set_msg(0,0,100) # 100 = queen
+            if rone.get_id() == 14: # for the robee that stays at the nav tower
+                                          # (that's you Timothy)
+                while True:
+                    hba.set_msg(0,0,100) # 100 = queen
             if new_nbrs:
                 print "idle"
                 
@@ -114,15 +116,18 @@ def fall():
             new_nbrs = beh.update()
         # Move towards the nav_tower until turning around distance reached
             if nav_tower != None:      # move forward
-                
-                if get_nbr_range_bits(leader) > 2:
-                    beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
-                    leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
-                elif get_nbr_range_bits(leader) < 2 and Found_Flower :
-                    state = STATE_RECRUIT
-                    rec_time = sys.time()
-                else:
-                    state = STATE_WANDER
+                for nbr in nbrList:
+                    (0,0,msg) = hba.get_msg_from_nbr(nbr,new_nbrs)
+                    if get_nbr_range_bits(queen) > 2:
+                        beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
+                        leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
+                    elif get_nbr_range_bits(queen) < 2 and Found_Flower and msg == 10:
+                        state = STATE_RETURN_TO_FLOWER                        
+                    elif get_nbr_range_bits(queen) < 2 and Found_Flower and hba.set_msg(0,0,10):
+                        state = STATE_RECRUIT
+                        rec_time = sys.time()
+                    else:
+                        state = STATE_WANDER
             distance_to_go = (motion_start_odo + MOVE_TO_TOWER_DISTANCE) - pose.get_odometer()
 
             # wait do we still need this
