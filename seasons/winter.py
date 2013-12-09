@@ -99,8 +99,7 @@ def winter():
         #set the HBA message
         msg = [0, 0, 0]
         msg[MSG_POS_IN_LIGHT] = self_in_light()
-        in_light = self_in_light()
-        hba.set_msg(in_light, 0, 0)
+        hba.set_msg(msg[0], msg[1], msg[2])
 
 # Helper functions
 
@@ -141,8 +140,8 @@ def get_near_nbr_in_dark(nbr_list):
         for nbr in nbrs_in_dark:
             if neighbors.get_nbr_range_bits(nbr) > neighbors.get_nbr_range_bits(nearest):
                 nearest = nbr
-    if neighbors.get_nbr_range_bits(nearest) < CLOSENESS_CONSTANT:
-        nearest = None
+        if neighbors.get_nbr_range_bits(nearest) < CLOSENESS_CONSTANT:
+            nearest = None
     return nearest
 
 def move_in_dir(bearing):
