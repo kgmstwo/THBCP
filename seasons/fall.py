@@ -32,7 +32,7 @@ COLLECT_POLLEN_TIME = 3000
 RECRUIT_TIME = 10 * 1000
 FOLLOW_TIME = 10 * 1000
 BACK_UP_TIME = 1000
-TURN_TIME = 1000
+TURN_TIME = 1700
 
 def fall():
     beh.init(0.22, 40, 0.5, 0.1)
@@ -91,14 +91,14 @@ def fall():
                 beh_out = beh.tvrv(tv,rv) 
                 turn_start_time = (collect_pollen_start_time + BACK_UP_TIME)
                 
-            elif sys.time() < (turn_start_time + TURN_TIME): #Potential issues here, will fix.
-                tv = 0
+            elif sys.time() < (turn_start_time + TURN_TIME): 
+                tv = 40
                 rv = -MOTION_RV
                 beh_out = beh.tvrv(tv,rv)
             
             else: 
                 tv = MOTION_TV
-                rv = MOTION_RV
+                rv = (MOTION_RV - 300)
                 beh_out = beh.tvrv(tv,rv)
         
         elif state == STATE_RETURN_TO_BASE:
