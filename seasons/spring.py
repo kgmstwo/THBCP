@@ -27,15 +27,16 @@ Found_Tree = False
 LED_BRIGHTNESS = 40
 MOVE_TO_TOWER_DISTANCE = 3000
 
+
 def spring():
     beh.init(0.22, 40, 0.5, 0.1)
 
     state = STATE_IDLE
-    diff_start = light_diff()
+    
     while True:
         # run the system updates
         new_nbrs = beh.update()
-        
+        diff_start = light_diff()
         nbrList = neighbors.get_neighbors()
         if new_nbrs:
             print nbrList
@@ -49,7 +50,7 @@ def spring():
             if new_nbrs:
                 print "idle"
         elif state == STATE_WANDER:
-            if tree_detect() == True:
+            if tree_detect(diff_start) == True:
                 state = STATE_MOVE_TO_TREE
             else:
                 #right now just runs forward and sideways, get fancy?
@@ -62,7 +63,7 @@ def spring():
                 (tv, rv) = go_to_tree(diff_start)
                 beh_out = beh.tvrv(tv, rv)
         elif state == STATE_RETURN:
-            nav_tower = hba.find_nav_tower_nbr(127)
+            nav_tower = hba.find_nav_tower_nbr(125)
             new_nbrs = beh.update()
             # Move towards the nav_tower until turning around distance reached
             if nav_tower != None:      # move forward
@@ -92,9 +93,21 @@ def spring():
                 else:
                     neighbors.set_message('LEADER')
                     
-        elif state == STATE_FOLLOW:
-            pass
-        
+        elif state == STATE_FOLLOW: 
+            
+            nbr_bearing = neighbors.get_nbr_bearing(nbr)
+            nbr_orientation = neighbors.get_nbr_orientation(nbr)
+            nbr_heading = math2.normalize_angle(math.pi + nbr_bearing - nbr_orientation) + math.pi 
+            
+            if nbr_heading > 2: 
+                beh_out = beh.tvrv(0, MOTION_RV)
+            
+            elif nbr_heading < 2:
+                beh_out = beh.tvrv(0,-MOTION_RV)
+            
+            else:
+                beh_out = beh.tvrv(MOTION_TV,0)
+                
         # end of the FSM
         bump_beh_out = beh.bump_beh(MOTION_TV)
         if state != STATE_RETURN:
@@ -124,7 +137,7 @@ def go_to_tree(diff_start):
         rv = 0
     return (tv,rv)
 
-def tree_detect():
+def tree_detect(diff_start):
     tree = False
     light = light_diff() - diff_start
     if light > 50:

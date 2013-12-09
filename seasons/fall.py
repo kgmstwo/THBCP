@@ -136,7 +136,7 @@ def fall():
                     beh_out = beh.follow_nbr(nav_tower) #just follow the nav tower
                 else:
                     if get_nbr_range_bits(queen) > 2:
-                        beh_out = beh.follow_nbr(nav_tower, MOTION_TV): #get closer to the queen
+                        beh_out = beh.follow_nbr(nav_tower, MOTION_TV) #get closer to the queen
                     else:
                         if Found_Flower:
                             recruit()
