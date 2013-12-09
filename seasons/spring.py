@@ -27,6 +27,7 @@ Found_Tree = False
 LED_BRIGHTNESS = 40
 MOVE_TO_TOWER_DISTANCE = 3000
 
+
 def spring():
     beh.init(0.22, 40, 0.5, 0.1)
 
@@ -92,9 +93,21 @@ def spring():
                 else:
                     neighbors.set_message('LEADER')
                     
-        elif state == STATE_FOLLOW:
-            pass
-        
+        elif state == STATE_FOLLOW: 
+            
+            nbr_bearing = neighbors.get_nbr_bearing(nbr)
+            nbr_orientation = neighbors.get_nbr_orientation(nbr)
+            nbr_heading = math2.normalize_angle(math.pi + nbr_bearing - nbr_orientation) + math.pi 
+            
+            if nbr_heading > 2: 
+                beh_out = beh.tvrv(0, MOTION_RV)
+            
+            elif nbr_heading < 2:
+                beh_out = beh.tvrv(0,-MOTION_RV)
+            
+            else:
+                beh_out = beh.tvrv(MOTION_TV,0)
+                
         # end of the FSM
         bump_beh_out = beh.bump_beh(MOTION_TV)
         if state != STATE_RETURN:
