@@ -25,7 +25,7 @@ MSG_POS_STATE = 0
 # Other constants
 LED_BRIGHTNESS = 40
 CLOSENESS_CONSTANT = 5
-BRIGHTNESS_CONSTANTS = {'fl':300, 'fr':300, 'b':300}
+BRIGHTNESS_CONSTANTS = {'fl':300, 'fr':300, 'r':300}
 
 def winter():
     global new_nbrs
@@ -51,7 +51,7 @@ def winter():
                 ##### in the light!
                 global BRIGHTNESS_CONSTANTS
                 for sensor_dir in BRIGHTNESS_CONSTANTS.keys():
-                    BRIGHTNESS_CONSTANT[sensor_dir] = 0.75 * rone.light_sensor_get_value(sensor_dir)
+                    BRIGHTNESS_CONSTANTS[sensor_dir] = 0.75 * rone.light_sensor_get_value(sensor_dir)
                 #####
                 initial_time = sys.time()
                 state = STATE_LIGHT
@@ -59,6 +59,7 @@ def winter():
                 print "idle"
 
         elif state == STATE_LIGHT:
+            leds.set_pattern('g', 'circle', LED_BRIGHTNESS)
             nbr_in_dark = get_near_nbr_in_dark(nbr_list)
             if nbr_in_dark != None:
                 bearing = neighbors.get_nbr_bearing(nbr_in_dark)
@@ -72,6 +73,7 @@ def winter():
                 state = STATE_DARK
 
         elif state == STATE_DARK:
+            leds.set_pattern('b', 'circle', LED_BRIGHTNESS)
             nbrs_in_light = get_nbrs_in_light()
             if len(nbrs_in_light) > 0:
                 bearing = get_avg_bearing_to_nbrs(nbrs_in_light)
