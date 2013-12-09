@@ -56,7 +56,7 @@ def fall():
             if rone.get_id() == leader_id: # for the robee that stays at the nav tower
                                           # (that's you Chris)
                 while True
-                hba.set_msg(0,0,'queen')
+                hba.set_msg(0,0,100) # 100 = queen
             if new_nbrs:
                 print "idle"
                 
@@ -84,7 +84,9 @@ def fall():
         elif state = STATE_COLLECT_POLLEN:
             motion_start_odo = pose.get_odometer()
             if sys.time() > (collect_pollen_start_time + COLLECT_POLLEN_TIME):
-                state = STATE_RETURN_TO_BASE  
+                state = STATE_RETURN_TO_BASE
+                Found_Flower = True
+                hba.set_msg(0,0,10) # guys look i'm a recruiter
             elif sys.time() < (collect_pollen_start_time + BACK_UP_TIME):    
                 tv = -MOTION_TV
                 rv = 0
@@ -106,14 +108,17 @@ def fall():
             new_nbrs = beh.update()
         # Move towards the nav_tower until turning around distance reached
             if nav_tower != None:      # move forward
+                
                 if get_nbr_range_bits(leader) > 2:
                     beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
                     leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
-                elif get_nbr_range_bits(leader) < 2 and Found_Flower:
+                elif get_nbr_range_bits(leader) < 2 and Found_Flower :
                     state = STATE_RECRUIT
+                    rec_time = sys.time()
                 else:
                     state = STATE_WANDER
             distance_to_go = (motion_start_odo + MOVE_TO_TOWER_DISTANCE) - pose.get_odometer()
+
             # wait do we still need this
             beh.motion_set(beh_out)
             if distance_to_go < 0:    
@@ -123,10 +128,20 @@ def fall():
                     state = STATE_WANDER
                     
         elif state == STATE_RETURN_TO_FLOWER:
-            pass
+##            nbr_list = hba.get_robot_neighbors()
+##            for nbr in nbr_list:
+##                (0,0,msg) = hba.get_msg_from_nbr(nbr,new_nbrs)
+##                if msg == 10:
+            
+                    
         
         elif state == STATE_RECRUIT:
-            pass
+            if sys.time() > (rec_time + RECRUIT_TIME):
+                hba.set_msg(0,0,10) # guys look i'm recruiting
+            else:
+                state = STATE_WANDER
+                
+                
         
         #END OF FINITE STATE MACHINE 
 
