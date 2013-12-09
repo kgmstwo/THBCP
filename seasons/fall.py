@@ -1,5 +1,4 @@
 import rone, sys, math, math2, velocity, pose, motion, leds, neighbors, beh, hba
-#import random #please
 
 ###########################################################
 ##
@@ -189,7 +188,7 @@ def find_queen(nbrList):
 
 def detflower(nbrList):
     for nbr in nbrList:
-        (state, unimportant, color) = hba.get_msg_from_nbr(nbr,new_nbr)
+        (state, asdf, color) = hba.get_msg_from_nbr(nbr,new_nbr)
         if state == STATE_FLOWER:
             return (nbr, COLORS[color])
     return (None, None)
