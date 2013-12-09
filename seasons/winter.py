@@ -17,19 +17,19 @@ MOTION_TV = 100
 STATE_IDLE = 0
 STATE_DARK = 1
 STATE_LIGHT = 2
-STATE_EDGE_OF_LIGHT = 3
+STATE_DEAD = 3
 
 # MSG components
 MSG_POS_STATE = 0
 
 # Other constants
 LED_BRIGHTNESS = 40
-CLOSENESS_CONSTANT = 4
-BRIGHTNESS_CONSTANTS = {'fl':300, 'fr':300, 'r':300}
+##CLOSENESS_CONSTANT = 3
+BRIGHTNESS_THRESHOLDS = {'fl':300, 'fr':300, 'r':300}
+ANGLE_TOL = 0.1 * math.pi
+LIFESPAN = 5000
 
 def winter():
-    global new_nbrs
-    
     beh.init(0.22, 40, 0.5, 0.1)
 
     state = STATE_IDLE
@@ -49,9 +49,9 @@ def winter():
                 ##### This is one way to find a cutoff for being in light.
                 ##### Make sure you press the 'r' button when the robot is
                 ##### in the light!
-                global BRIGHTNESS_CONSTANTS
-                for sensor_dir in BRIGHTNESS_CONSTANTS.keys():
-                    BRIGHTNESS_CONSTANTS[sensor_dir] = 0.75 * rone.light_sensor_get_value(sensor_dir)
+                global BRIGHTNESS_THRESHOLDS
+                for sensor_dir in BRIGHTNESS_THRESHOLDS.keys():
+                    BRIGHTNESS_THRESHOLDS[sensor_dir] = 0.75 * rone.light_sensor_get_value(sensor_dir)
                 #####
                 initial_time = sys.time()
                 state = STATE_LIGHT
@@ -60,38 +60,43 @@ def winter():
 
         elif state == STATE_LIGHT:
             leds.set_pattern('g', 'circle', LED_BRIGHTNESS)
-            nbr_in_dark = get_near_nbr_in_dark(nbr_list)
+            nbr_in_dark = get_nearest_nbr_in_dark(nbr_list)
             if nbr_in_dark != None:
                 bearing = neighbors.get_nbr_bearing(nbr_in_dark)
                 bearing = bearing - math.pi
                 bearing = math2.normalize_angle(bearing)
                 beh_out = move_in_dir(bearing)
-            else:
-                beh_out = (0, 0, True)
 
             if not self_in_light():
+                dark_start_time = sys.time()
                 state = STATE_DARK
 
         elif state == STATE_DARK:
             leds.set_pattern('b', 'circle', LED_BRIGHTNESS)
             nbrs_in_light = get_nbrs_in_light()
+            nbrs_in_dark = get_nbrs_in_dark()
             if len(nbrs_in_light) > 0:
                 bearing = get_avg_bearing_to_nbrs(nbrs_in_light)
                 beh_out = move_in_dir(bearing)
-            else:
-                beh_out = (MOTION_TV, MOTION_RV, True)
+            elif len(nbrs_in_dark) > 0:
+                bearing = get_avg_bearing_to_nbrs(nbrs_in_dark)
+                beh_out = move_in_dir(bearing)
 
             if self_in_light():
                 state = STATE_LIGHT
 
-        elif state == STATE_EDGE_OF_LIGHT:
+            elif sys.time() - dark_start_time > LIFESPAN:
+                score_time = hba.winter_time_keeper(initial_time)
+                hba.winter_score_calc(score_time, LED_BRIGHTNESS)
+                state = STATE_DEAD
+
+        elif state == STATE_DEAD:
             pass
 
         # end of the FSM
 
-        # BUMP_BEH IS NOT HELPFUL IN WINTER
-        # bump_beh_out = beh.bump_beh(MOTION_TV)
-        # beh_out = beh.subsume([beh_out, bump_beh_out])
+##        bump_beh_out = beh.bump_beh(MOTION_TV)
+##        beh_out = beh.subsume([beh_out, bump_beh_out])
 
         # set the beh velocities
         beh.motion_set(beh_out)
@@ -134,7 +139,7 @@ def get_avg_bearing_to_nbrs(nbr_list):
     avg_bearing = math2.normalize_angle(avg_bearing)
     return avg_bearing
 
-def get_near_nbr_in_dark(nbr_list):
+def get_nearest_nbr_in_dark(nbr_list):
     nbrs_in_dark = get_nbrs_in_dark()
     nearest = None
     if len(nbrs_in_dark) > 0:
@@ -142,32 +147,37 @@ def get_near_nbr_in_dark(nbr_list):
         for nbr in nbrs_in_dark:
             if neighbors.get_nbr_range_bits(nbr) > neighbors.get_nbr_range_bits(nearest):
                 nearest = nbr
-        if neighbors.get_nbr_range_bits(nearest) < CLOSENESS_CONSTANT:
-            nearest = None
+##        if neighbors.get_nbr_range_bits(nearest) < CLOSENESS_CONSTANT:
+##            nearest = None
     return nearest
 
 def move_in_dir(bearing):
     bearing = math2.normalize_angle(bearing)
+    tv = 0
     if bearing >= 0:
         if bearing > math.pi / 2:
-            tv = int(-MOTION_TV * (-1.0 + bearing * 2.0 / math.pi))
             rv = int(-MOTION_RV * (2.0 - bearing * 2.0 / math.pi))
+            if bearing > (math.pi - ANGLE_TOL):
+                tv = -MOTION_TV
         else:
-            tv = int(MOTION_TV * (1.0 - bearing * 2.0 / math.pi))
             rv = int(MOTION_RV * (bearing * 2.0 / math.pi))
+            if bearing < ANGLE_TOL:
+                tv = MOTION_TV
     else:
         if bearing < -math.pi / 2:
-            tv = int(-MOTION_TV * (-1.0 - bearing * 2.0 / math.pi))
             rv = int(MOTION_RV * (2.0 + bearing * 2.0 / math.pi))
+            if -bearing > (math.pi - ANGLE_TOL):
+                tv = -MOTION_TV
         else:
-            tv = int(MOTION_TV * (1.0 + bearing * 2.0 / math.pi))
             rv = int(-MOTION_RV * (-bearing * 2.0 / math.pi))
+            if -bearing < ANGLE_TOL:
+                tv = MOTION_TV
     return tv, rv
 
 def self_in_light():
     any_in_light = False
-    for sensor_dir in BRIGHTNESS_CONSTANTS.keys():
-        this_one_in_light = (rone.light_sensor_get_value(sensor_dir) > BRIGHTNESS_CONSTANTS[sensor_dir])
+    for sensor_dir in BRIGHTNESS_THRESHOLDS.keys():
+        this_one_in_light = (rone.light_sensor_get_value(sensor_dir) > BRIGHTNESS_THRESHOLDS[sensor_dir])
         any_in_light = any_in_light or this_one_in_light
     return any_in_light
 
