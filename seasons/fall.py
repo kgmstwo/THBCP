@@ -131,7 +131,7 @@ def fall():
                     beh_out = beh.follow_nbr(nav_tower) #just follow the nav tower
                 else:
                     if get_nbr_range_bits(queen) > 2:
-                        beh_out = beh.follow_nbr(nav_tower, MOTION_TV): #get closer to the queen
+                        beh_out = beh.follow_nbr(nav_tower, MOTION_TV) #get closer to the queen
                     else:
                         if Found_Flower:
                             recruit()
@@ -143,6 +143,7 @@ def fall():
             for nbr in nbr_list:
                 state = hba.get_msg_from_nbr(nbr,new_nbrs)[MSG_STATE]
                 if msg == 10:
+                    pass
         elif state == STATE_RECRUIT:
             if sys.time() > (rec_time + RECRUIT_TIME):
                 wander()
