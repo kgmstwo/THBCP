@@ -76,7 +76,7 @@ def winter():
         elif state == STATE_DARK:
             nbrs_in_light = get_nbrs_in_light()
             if len(nbrs_in_light) > 0:
-                bearing = get_avg_bearing(nbrs_in_light)
+                bearing = get_avg_bearing_to_nbrs(nbrs_in_light)
                 beh_out = move_in_dir(bearing)
             else:
                 beh_out = (MOTION_TV, MOTION_RV, True)
