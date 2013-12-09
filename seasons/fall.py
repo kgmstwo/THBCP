@@ -60,8 +60,7 @@ def fall():
             leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
             if rone.button_get_value('r'):
                 state = STATE_MOVE_TO_FLOWER
-            if rone.get_id() == queen_id: # for the robee that stays at the nav tower
-                # (that's you Timothy)
+            if rone.button_get_value('b'):
                 state = STATE_QUEEN
             if new_nbrs:
                 print "idle"
