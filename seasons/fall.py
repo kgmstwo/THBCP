@@ -1,5 +1,5 @@
 import rone, sys, math, math2, velocity, pose, motion, leds, neighbors, beh, hba
-import random #please
+#import random #please
 
 ###########################################################
 ##
@@ -25,16 +25,14 @@ STATE_RETURN_TO_FLOWER = 6
 STATE_RECRUIT = 7
 STATE_QUEEN = 8
 
-# Global Data
-Found_Flower = False
-
 # MSG items
 MSG_STATE = 0
 
 # Other constants
 LED_BRIGHTNESS = 40
-COLLECT_POLLEN_TIME = 3000
+COLORS = ['red','green','blue']
 
+COLLECT_POLLEN_TIME = 3000
 #these are the time to wait at base before heading out again
 RECRUIT_TIME = 10 * 1000
 FOLLOW_TIME = 10 * 1000
@@ -44,6 +42,12 @@ TURN_TIME = 1700
 queen_id = 17
 
 def fall(): 
+    Found_Flower = False
+    Found_Follower = False
+    collect_pollen_start_time = 0
+    recruit_start_time = 0
+    follow_start_time = 0
+    back_up_start_time = 0
     def wander():
         state = STATE_WANDER
         ri = 0
@@ -51,9 +55,11 @@ def fall():
         state = STATE_COLLECT_POLLEN
         collect_pollen_start_time = sys.time()
     def follow():
-        state = STATE_RETURN_TO_FLOWER
+        state = STATE_FOLLOW
+        follow_start_time = sys.time()
     def recruit():
         state = STATE_RECRUIT
+        recruit_start_time = sys.time()
 
     beh.init(0.22, 40, 0.5, 0.1)
     state = STATE_IDLE
@@ -65,7 +71,6 @@ def fall():
         if new_nbrs:
             print nbrList
         beh_out = beh.BEH_INACTIVE
-
 
         #FINITE STATE MACHINE
         if state == STATE_IDLE:
@@ -83,7 +88,7 @@ def fall():
 
             #This might do browninan motion
             beh_out = (beh_out[0], beh_out[1] + ri)
-            ri += random.random() * 2 - 1
+            #ri += random.random() * 2 - 1
 
             (flower, color) = detflower(nbrList)
             if flower != None:
@@ -138,14 +143,27 @@ def fall():
                         else:
                             follow()
 
-        elif state == STATE_RETURN_TO_FLOWER:
-            nbr_list = hba.get_robot_neighbors()
-            for nbr in nbr_list:
-                state = hba.get_msg_from_nbr(nbr,new_nbrs)[MSG_STATE]
-                if msg == 10:
+        elif state == STATE_FOLLOW:
+            recruiter = find_recruiter()
+            if recruiter == None:
+                beh_out = beh.BEH_INACTIVE
+                if sys.time() > (follow_start_time + FOLLOW_TIME):
+                    wander()
+            else:
+                if True: #aligned with recruiter
+                    state = STATE_GO
+                else:
+                    #write: align with recruiter
+                    pass
+        elif state == STATE_GO:
+            flower = detflower()
+            if not flower == None:
+                state = STATE_MOVE_TO_FLOWER
         elif state == STATE_RECRUIT:
-            if sys.time() > (rec_time + RECRUIT_TIME):
-                wander()
+            if sys.time() > (recruit_start_time + RECRUIT_TIME):
+                follow() #self?
+            else:
+                pass
 
 
         #END OF FINITE STATE MACHINE 
@@ -156,24 +174,24 @@ def fall():
         beh.motion_set(beh_out)
         hba.set_msg(state, 0, 0)
 
+def find_recruiter(nbrList):
+    for nbr in nbrList:
+        state = hba.get_msg_from_nbr(nbr,new_nbrs)[MSG_STATE]
+        if state == STATE_RECRUIT:
+            return nbr
+    return None
+
 def find_queen(nbrList):
     for nbr in nbrList:
-        if neighbors.get_nbr_id(nbr):
+        if not neighbors.get_nbr_id(nbr) == None:
             return nbr
     return None
 
 def detflower(nbrList):
     for nbr in nbrList:
-        color = None
-        (state, unimportant, color) = hba.get_msg_from_nbr(nbr,0)
+        (state, unimportant, color) = hba.get_msg_from_nbr(nbr,new_nbr)
         if state == STATE_FLOWER:
-            if color == 0:
-                color = 'red'
-            elif color == 1:
-                color = 'green'
-            elif color == 2:
-                color = 'blue'
-            return (nbr, color)
+            return (nbr, COLORS[color])
     return (None, None)
 
 fall()
