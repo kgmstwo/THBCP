@@ -54,8 +54,10 @@ def spring():
                 state = STATE_MOVE_TO_TREE
             else:
                 for nbr in nbrList:
-                    beh_out = beh.avoid_nbr(nbr, MOTION_TV)
-##                beh_out = beh.tvrv(MOTION_TV, MOTION_RV)
+                    beh_out = beh.avoid_nbr(nbr, MOTION_TV) # avoid everyone
+                if len(nbrList) < 1:
+                    beh_out = beh.tvrv(-MOTION_TV,0) # out of range: go backwards and hopefully get in range again
+                    # i tried.
         elif state == STATE_MOVE_TO_TREE:
             if not beh.bump_angle_get() == None:
                 motion_start_odo = pose.get_odometer()
