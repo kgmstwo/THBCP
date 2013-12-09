@@ -52,20 +52,14 @@ def spring():
         elif state == STATE_WANDER:
             if tree_detect(diff_start) == True:
                 Found_Tree = True
-                state = STATE_MOVE_TO_TREE
+                state = STATE_RETURN
             else:
                 nav = hba.find_nav_tower_nbr(125)
                 beh_out = beh.avoid_nbr(nav, MOTION_TV) # avoid navtower
                     # i tried.
-        elif state == STATE_MOVE_TO_TREE:
-            if not beh.bump_angle_get() == None:
-                motion_start_odo = pose.get_odometer()
-                state = STATE_RETURN
-            else:
-                (tv, rv) = go_to_tree(diff_start)
-                beh_out = beh.tvrv(tv, rv)
+       
         elif state == STATE_RETURN:
-            nav_tower = hba.find_nav_tower_nbr(125)
+            nav_tower = hba.find_nav_tower_nbr(124)
             # Move towards the nav_tower until turning around distance reached
             if nav_tower != None:      # move forward
                 beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
@@ -145,14 +139,8 @@ def go_to_tree(diff_start):
 
 def tree_detect(diff_start):
     tree = False
-    light = light_diff() - diff_start
-    if light > 50:
+    if rone.bump_sensors_get_value(1) == 1:
         tree = True
-    elif light < -50:
-        tree = True
-    else:
-        tree = False
-    return tree
 
 # Start!
 spring()
