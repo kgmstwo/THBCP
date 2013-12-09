@@ -38,7 +38,9 @@ FOLLOW_TIME = 10 * 1000
 BACK_UP_TIME = 1000
 TURN_TIME = 1700
 
-def fall():
+#Tim is sorry
+
+def fall(): 
     beh.init(0.22, 40, 0.5, 0.1)
     state = STATE_IDLE
     motion_start_odo = pose.get_odometer()
