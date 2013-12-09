@@ -104,6 +104,7 @@ def winter():
 # Helper functions
 
 def get_nbrs_in_light():
+    new_nbrs = 0
     nbr_list = hba.get_robot_neighbors()
     nbrs_in_light = []
     for nbr in nbr_list:
@@ -113,6 +114,7 @@ def get_nbrs_in_light():
     return nbrs_in_light
 
 def get_nbrs_in_dark():
+    new_nbrs = 0
     nbr_list = hba.get_robot_neighbors()
     nbrs_in_dark = []
     for nbr in nbr_list:
