@@ -1,4 +1,5 @@
 import rone, sys, math, math2, velocity, pose, motion, leds, neighbors, beh, hba
+import random #please
 
 ###########################################################
 ##
@@ -43,6 +44,13 @@ TURN_TIME = 1700
 queen_id = 17
 
 def fall(): 
+    def wander():
+        state = STATE_WANDER
+        ri = 0
+    def collect_pollen():
+        state = STATE_COLLECT_POLLEN
+        collect_pollen_start_time = sys.time()
+
     beh.init(0.22, 40, 0.5, 0.1)
     state = STATE_IDLE
     motion_start_odo = pose.get_odometer()
@@ -67,25 +75,24 @@ def fall():
 
         elif state == STATE_WANDER: #run forward, avoid direction of neighbors
             nav_tower = hba.find_nav_tower_nbr(127)
-            beh_out = beh.avoid_nbr(nav_tower, MOTION_TV) # possible state head out?
-            for nbr in nbrList:
-                beh_out = beh.avoid_nbr(nbr, MOTION_TV)
-            if new_nbrs:
-                (color,nbr) = detflower(nbrList)
-                flower = nbr
-            if flower != None and color == 'blue': # CHANGE THIS COLOR TO WHATEVER
+            beh_out = beh.avoid_nbr(nav_tower, MOTION_TV)
+
+            #This might do browninan motion
+            beh_out = (beh_out[0], beh_out[1] + ri)
+            ri += random.random() * 2 - 1
+
+            (flower, color) = detflower(nbrList)
+            if flower != None:
                 state = STATE_MOVE_TO_FLOWER
 
         elif state == STATE_MOVE_TO_FLOWER:
             leds.set_pattern('b', 'ramp_slow', LED_BRIGHTNESS)
-                # Stop if we get close or bump into the flower
-            (color,nbr) = detflower(nbrList)
-            flower = nbr
+            (flower, color) = detflower(nbrList)
             if (neighbors.get_nbr_range_bits(flower) > 6) or (beh.bump_angle_get() != None):
-                state = STATE_COLLECT_POLLEN
-                collect_pollen_start_time = sys.time()
+                #collect pollen if we bump or get close
+                collect_pollen()
             else:
-                # Move to the flower
+                #otherwise keep following that flower
                 beh_out = beh.follow_nbr(flower, MOTION_TV)
 
         elif state == STATE_COLLECT_POLLEN:
@@ -93,7 +100,6 @@ def fall():
             if sys.time() > (collect_pollen_start_time + COLLECT_POLLEN_TIME):
                 state = STATE_RETURN_TO_BASE
                 Found_Flower = True
-                #hba.set_msg(0,0,10) # guys look i'm a recruiter
             elif sys.time() < (collect_pollen_start_time + BACK_UP_TIME):    
                 tv = -MOTION_TV
                 rv = 0
@@ -114,27 +120,26 @@ def fall():
             nav_tower = hba.find_nav_tower_nbr(127)
             queen = find_queen()
             new_nbrs = beh.update()
-            # Move towards the nav_tower until turning around distance reached
-            if not nav_tower == None:      # move forward
-                if not queen == None:
-                    if get_nbr_range_bits(queen) > 2: beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
-                        leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
-                    elif get_nbr_range_bits(queen) < 2 and Found_Flower
-                        state = STATE_RETURN_TO_FLOWER                        
-                    elif get_nbr_range_bits(queen) < 2 and Found_Flower:
-                        state = STATE_RECRUIT
-                        rec_time = sys.time()
-                    else:
-                        state = STATE_WANDER
-            distance_to_go = (motion_start_odo + MOVE_TO_TOWER_DISTANCE) - pose.get_odometer()
-
-            # wait do we still need this
-            beh.motion_set(beh_out)
-            if distance_to_go < 0:    
-                if Found_Flower:
-                    state = STATE_RETURN_TO_FLOWER
+            if nav_tower == None:
+                #we're in trouble
+                wander()
+                pass
+            else:
+                if queen == None:
+                    #just follow the nav tower
+                    beh_out = beh.follow_nbr(nav_tower)
                 else:
-                    state = STATE_WANDER
+                    if get_nbr_range_bits(queen) > 2:
+                        #get closer to the queen
+                        beh_out = beh.follow_nbr(nav_tower, MOTION_TV):
+                    else:
+                        if Found_Flower:
+                            #recruit for a while, then return to flower
+                            state = STATE_RETURN_TO_FLOWER                        
+                        else:
+                            #wait for a leader, then wander
+                            state = STATE_RECRUIT
+                            rec_time = sys.time()
 
         elif state == STATE_RETURN_TO_FLOWER:
             nbr_list = hba.get_robot_neighbors()
@@ -143,7 +148,8 @@ def fall():
                 if msg == 10:
         elif state == STATE_RECRUIT:
             if sys.time() > (rec_time + RECRUIT_TIME):
-                state = STATE_WANDER
+                wander()
+
 
         #END OF FINITE STATE MACHINE 
 
@@ -162,15 +168,15 @@ def find_queen():
 def detflower(nbrList):
     for nbr in nbrList:
         color = None
-        (state, unimportant, colormsg) = hba.get_msg_from_nbr(nbr,0)
+        (state, unimportant, color) = hba.get_msg_from_nbr(nbr,0)
         if state == STATE_FLOWER:
-            if colormsg == 0:
+            if color == 0:
                 color = 'red'
-            elif colormsg == 1:
+            elif color == 1:
                 color = 'green'
-            elif colormsg == 2:
+            elif color == 2:
                 color = 'blue'
-            return (color, nbr)
+            return (nbr, color)
     return (None, None)
 
 fall()
