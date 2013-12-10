@@ -33,10 +33,8 @@ def winter():
     beh.init(0.22, 40, 0.5, 0.1)
 
     state = STATE_IDLE
-
-    looping = True
     
-    while looping:
+    while True:
         # run the system updates
         new_nbrs = beh.update()
         
@@ -89,13 +87,11 @@ def winter():
                 state = STATE_LIGHT
             elif sys.time() - dark_start_time > LIFESPAN:
                 score_time = hba.winter_time_keeper(initial_time)
+                hba.winter_score_calc(score_time, LED_BRIGHTNESS)
                 state = STATE_DEAD
 
         elif state == STATE_DEAD:
-            hba.winter_score_calc(score_time, LED_BRIGHTNESS)
-
-            if rone.button_get_value('b'):
-                looping = False
+            pass
 
         # end of the FSM
 
