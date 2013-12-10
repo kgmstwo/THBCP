@@ -27,6 +27,7 @@ MSG_IDX_STATE = 0
 
 # Other constants
 LED_BRIGHTNESS = 40
+
 RANGE_BITS_CLOSE = 4
 NAV_ID = 14 # 125
 INSURANCE_TIME = 5 * 1000
@@ -58,6 +59,7 @@ def spring():
                 print "idle"
                 
             if rone.button_get_value('r'):
+                pose.set_pose(0, 0, 0)
                 state = STATE_WANDER
             elif rone.button_get_value('b'):
                 state = STATE_QUEEN
@@ -69,12 +71,14 @@ def spring():
             
             if bump_front():
                 tree_pose = pose.get_pose()
+                motion.set_goal([0, 0], MOTION_TV)
                 state = STATE_RETURN
             elif nav == None:
+                motion.set_goal([0, 0], MOTION_TV)
                 state = STATE_RETURN
        
         elif state == STATE_RETURN:
-            nav_tower = hba.find_nav_tower_nbr(NAV_ID)
+##            nav_tower = hba.find_nav_tower_nbr(NAV_ID)
             queen = None
             recruiter = None
             leader = None
@@ -89,10 +93,10 @@ def spring():
             if leader != None:
                 start_time = sys.time()
                 state = STATE_FOLLOW
-            elif nav_tower == None:
-                beh_out = beh.tvrv(-MOTION_TV, 0)
+##            elif nav_tower == None:
+##                beh_out = beh.tvrv(-MOTION_TV, 0)
             elif queen == None:
-                beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
+                beh_out = motion.update()
             elif not close_to_nbr(queen):
                 beh_out = beh.follow_nbr(queen, MOTION_TV)
             elif (tree_pose != None) and (recruiter == None):
@@ -117,6 +121,7 @@ def spring():
             if new_followers > followers:
                 start_time = sys.time()
             if followers == 4 or sys.time() > start_time + WAIT_TIME:
+                motion.set_goal(tree_pose, MOTION_TV)
                 state = STATE_LEADER
 
         elif state == STATE_QUEEN:
@@ -166,7 +171,7 @@ def spring():
                 beh_out = beh.BEH_INACTIVE
 
         elif state == STATE_LEADER:
-            motion.set_goal(tree_pose)
+            beh_out = motion.update()
             if motion.is_done():
                 state = STATE_SUCCESS
                 
