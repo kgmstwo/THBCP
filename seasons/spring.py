@@ -29,8 +29,7 @@ MSG_IDX_STATE = 0
 LED_BRIGHTNESS = 40
 RANGE_BITS_CLOSE = 3
 NAV_ID = 125
-
-
+INSURANCE_TIME = 5000
 
 def spring():
     found_tree = False
@@ -130,6 +129,7 @@ def spring():
         elif state == STATE_FOLLOW: 
             recruiter = None
             leader = None
+            success = False
             new_followers = 1
             for nbr in nbr_list:
                 nbr_state = hba.get_msg_from_nbr(nbr,new_nbrs)[MSG_IDX_STATE]
@@ -137,6 +137,9 @@ def spring():
                     recruiter = nbr
                 elif nbr_state == STATE_LEAD:
                     leader = nbr
+                elif nbr_state is STATE_SUCCESS:
+                    leader = nbr
+                    success = True
                 elif nbr_state == STATE_FOLLOW or nbr_state == STATE_WANDER:
                     new_followers += 1
             if new_followers > followers:
@@ -151,6 +154,8 @@ def spring():
                         state = STATE_WANDER
                 else:
                     beh_out = beh.follow_nbr(leader)
+                    if sys.time() > start_time + INSURANCE_TIME:
+                        state = STATE_SUCCESS
             else:
                 beh_out = beh.BEH_INACTIVE
 
