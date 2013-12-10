@@ -33,6 +33,7 @@ MSG_STATE = 0
 
 # Other constants
 LED_BRIGHTNESS = 40
+HEADING_ERROR_LIMIT = math.pi / 10
 COLORS = ['red','green','blue']
 
 COLLECT_POLLEN_TIME = 3000
@@ -68,7 +69,7 @@ def fall():
 
     beh.init(0.22, 40, 0.5, 0.1)
     state = STATE_IDLE
-    motion_start_odo = pose.get_odometer()
+    #motion_start_odo = pose.get_odometer()
 
     while True:
         new_nbrs = beh.update()
@@ -168,7 +169,8 @@ def fall():
             heading_error = math.normalize_angle(pose.get_theta() - target_theta)
             rv = ROTATE_RV_GAIN * heading_error
             beh_out = beh.tvrv(tv, rv)
-            small_error = hba.average_error_check(heading_error, error_list, HEADING_ERROR_LIMIT, new_nbrs)
+            # you could actually do a running average in the list here
+            small_error = hba.average_error_check(heading_error, [], HEADING_ERROR_LIMIT, new_nbrs)
             if new_nbrs:
                 print "error", error_list
             if small_error:
