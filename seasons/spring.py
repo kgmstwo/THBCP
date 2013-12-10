@@ -27,18 +27,17 @@ MSG_IDX_STATE = 0
 
 # Other constants
 LED_BRIGHTNESS = 40
-RANGE_BITS_CLOSE = 2
+RANGE_BITS_CLOSE = 3
+NAV_ID = 125
 
 
 
 def spring():
-    tree_found = False
+    found_tree = False
 
     beh.init(0.22, 40, 0.5, 0.1)
 
     state = STATE_IDLE
-
-    light_diff_start = light_diff()
     
     while True:
         # run the system updates
@@ -60,36 +59,30 @@ def spring():
                 state = STATE_QUEEN
                 
         elif state == STATE_WANDER:
+            nav = hba.find_nav_tower_nbr(NAV_ID)
+            beh_out = beh.avoid_nbr(nav, MOTION_TV)
+            
             if bump_front():
-                Found_Tree = True
+                found_tree = True
                 state = STATE_RETURN
-            elif 
-            else:
-                nav = hba.find_nav_tower_nbr(125)
-                beh_out = beh.avoid_nbr(nav, MOTION_TV) # avoid navtower
-                    # i tried.
+            elif nav is None:
+                state = STATE_RETURN
        
         elif state == STATE_RETURN:
-            nav_tower = hba.find_nav_tower_nbr(124)
-            # Move towards the nav_tower until turning around distance reached
-            if nav_tower != None:      # move forward
-                beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
-                leds.set_pattern('g', 'blink_fast', LED_BRIGHTNESS)
+            nav_tower = hba.find_nav_tower_nbr(NAV_ID)
+            queen = find_queen(nbr_list)
+            if nav_tower is None:
+                beh_out = (-MOTION_TV, 0, True)
+            elif queen is None:
+                beh_out = beh.follow_nbr(nav_tower)
+            elif not close_to_nbr(queen):
+                beh_out = beh.follow_nbr(queen, MOTION_TV)
+            elif found_tree:
+                start_time = sys.time()
+                state = STATE_RECRUIT
             else:
-                leds.set_pattern('g', 'circle', LED_BRIGHTNESS)
-                beh_out = beh.follow_nbr(nav_tower, MOTION_TV)  
-            distance_to_go = (motion_start_odo + MOVE_TO_TOWER_DISTANCE) - pose.get_odometer()
-            beh.motion_set(beh_out)
-            if rone.bump_sensors_get_value(1) == 1:
-                if Found_Tree == True:
-                    state = STATE_RECRUIT
-                else:
-                    state = STATE_FOLLOW   
-            if distance_to_go < 0:    
-                if Found_Tree == True:
-                    state = STATE_RECRUIT
-                else:
-                    state = STATE_FOLLOW   
+                start_time = sys.time()
+                state = STATE_FOLLOW
             
         elif state == STATE_RECRUIT:
             for nbr in hba.get_robot_neighbors():
@@ -134,8 +127,8 @@ def spring():
 
 # Helper functions
 def light_diff():
-    lightdiff = rone.light_sensor_get_value('fl')-rone.light_sensor_get_value('fr')
-    return lightdiff #positive = right, negative = left
+    diff = rone.light_sensor_get_value('fl')-rone.light_sensor_get_value('fr')
+    return diff #positive = right, negative = left
 
 ##def go_to_tree(diff_start):
 ##    diff = light_diff() - diff_start
@@ -150,14 +143,18 @@ def light_diff():
 ##        rv = 0
 ##    return (tv,rv)
 ##
-def tree_detect(diff_start):
-    tree = False
-    if rone.bump_sensors_get_value(1) == 1:
-        tree = True
+##def tree_detect(diff_start):
+##    tree = False
+##    if rone.bump_sensors_get_value(1) == 1:
+##        tree = True
 
 def bump_front():
+    # Returns true if any of the front 6 out of 8 sensors are triggered
     bump_bits = rone.bump_sensors_get_value()
-    return bump_front_get_value(bump_bits)
+    return (bump_bits & 231) > 0
+
+def close_to_nbr(nbr):
+    return neighbors.get_nbr_range_bits(nbr) >= RANGE_BITS_CLOSE
 
 # Start!
 spring()
