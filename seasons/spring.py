@@ -14,20 +14,25 @@ MOTION_TV = 100
 
 # FSM States
 STATE_IDLE = 0
-STATE_WANDER = 1 
-STATE_MOVE_TO_TREE = 2
+STATE_QUEEN = 1
+STATE_WANDER = 2
 STATE_RETURN = 3
 STATE_RECRUIT = 4
 STATE_FOLLOW = 5
+STATE_LEAD = 6
+STATE_SUCCESS = 7
 
+# MSG indexes
+MSG_IDX_STATE = 0
 
 # Other constants
 LED_BRIGHTNESS = 40
-MOVE_TO_TOWER_DISTANCE = 3000
-WANDER = 3000
+RANGE_BITS_CLOSE = 2
+
+
 
 def spring():
-    Found_Tree = False
+    tree_found = False
 
     beh.init(0.22, 40, 0.5, 0.1)
 
@@ -112,34 +117,36 @@ def spring():
                 beh_out = beh.tvrv(MOTION_TV,0)
                 
         # end of the FSM
-        bump_beh_out = beh.bump_beh(MOTION_TV)
-        if state != STATE_RETURN:
+        if state not in [STATE_RETURN, STATE_RECRUIT]:
+            bump_beh_out = beh.bump_beh(MOTION_TV)
             beh_out = beh.subsume([beh_out, bump_beh_out])
 
         # set the beh velocities
         beh.motion_set(beh_out)
 
         #set the HBA message
-        hba.set_msg(state, 0, 0)
+        msg = [0, 0, 0]
+        msg[MSG_IDX_STATE] = state
+        hba.set_msg(msg[0], msg[1], msg[2])
 
 # Helper functions
 def light_diff():
     lightdiff = rone.light_sensor_get_value('fl')-rone.light_sensor_get_value('fr')
     return lightdiff #positive = right, negative = left
 
-def go_to_tree(diff_start):
-    diff = light_diff() - diff_start
-    if diff > 50:
-        rv = MOTION_RV
-        tv = 0
-    elif diff < -50:
-        rv = -MOTION_RV
-        tv = 0
-    else:
-        tv = MOTION_TV
-        rv = 0
-    return (tv,rv)
-
+##def go_to_tree(diff_start):
+##    diff = light_diff() - diff_start
+##    if diff > 50:
+##        rv = MOTION_RV
+##        tv = 0
+##    elif diff < -50:
+##        rv = -MOTION_RV
+##        tv = 0
+##    else:
+##        tv = MOTION_TV
+##        rv = 0
+##    return (tv,rv)
+##
 def tree_detect(diff_start):
     tree = False
     if rone.bump_sensors_get_value(1) == 1:
