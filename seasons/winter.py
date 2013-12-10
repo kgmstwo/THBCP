@@ -20,7 +20,7 @@ STATE_LIGHT = 2
 STATE_DEAD = 3
 
 # MSG components
-MSG_POS_STATE = 0
+MSG_IDX_STATE = 0
 
 # Other constants
 LED_BRIGHTNESS = 40
@@ -33,6 +33,8 @@ def winter():
     beh.init(0.22, 40, 0.5, 0.1)
 
     state = STATE_IDLE
+
+    manual_control = False
     
     while True:
         # run the system updates
@@ -61,6 +63,8 @@ def winter():
 
         elif state == STATE_LIGHT:
             leds.set_pattern('g', 'circle', LED_BRIGHTNESS)
+            if manual_control:
+                leds.set_pattern('gr', 'group', LED_BRIGHTNESS)
             nbr_in_dark = get_nearest_nbr_in_dark(nbr_list)
             if nbr_in_dark != None:
                 bearing = neighbors.get_nbr_bearing(nbr_in_dark)
@@ -68,12 +72,20 @@ def winter():
                 bearing = math2.normalize_angle(bearing)
                 beh_out = move_in_dir(bearing)
 
-            if not self_in_light():
+            if (not self_in_light()) and (not manual_control):
                 dark_start_time = sys.time()
                 state = STATE_DARK
+            if manual_control:
+                if rone.button_get_value('b'):
+                    dark_start_time = sys.time()
+                    state = STATE_DARK
+                elif rone.button_get_value('r'):
+                    state = STATE_IDLE
 
         elif state == STATE_DARK:
             leds.set_pattern('b', 'circle', LED_BRIGHTNESS)
+            if manual_control:
+                leds.set_pattern('br', 'group', LED_BRIGHTNESS)
             nbrs_in_light = get_nbrs_in_light()
             nbrs_in_dark = get_nbrs_in_dark()
             if len(nbrs_in_light) > 0:
@@ -83,12 +95,18 @@ def winter():
                 bearing = get_avg_bearing_to_nbrs(nbrs_in_dark)
                 beh_out = move_in_dir(bearing)
 
-            if self_in_light():
-                state = STATE_LIGHT
-            elif sys.time() - dark_start_time > LIFESPAN:
-                score_time = hba.winter_time_keeper(initial_time)
-                hba.winter_score_calc(score_time, LED_BRIGHTNESS)
-                state = STATE_DEAD
+            if not manual_control:
+                if self_in_light():
+                    state = STATE_LIGHT
+                elif sys.time() - dark_start_time > LIFESPAN:
+                    score_time = hba.winter_time_keeper(initial_time)
+                    hba.winter_score_calc(score_time, LED_BRIGHTNESS)
+                    state = STATE_DEAD
+            else:
+                if rone.button_get_value('g'):
+                    state = STATE_LIGHT
+                elif rone.button_get_value('r'):
+                    state = STATE_IDLE
 
         elif state == STATE_DEAD:
             pass
@@ -103,7 +121,7 @@ def winter():
 
         #set the HBA message
         msg = [0, 0, 0]
-        msg[MSG_POS_STATE] = state
+        msg[MSG_IDX_STATE] = state
         hba.set_msg(msg[0], msg[1], msg[2])
 
 # Helper functions
@@ -113,7 +131,7 @@ def get_nbrs_in_light():
     nbr_list = hba.get_robot_neighbors()
     nbrs_in_light = []
     for nbr in nbr_list:
-        state = hba.get_msg_from_nbr(nbr, new_nbrs)[MSG_POS_STATE]
+        state = hba.get_msg_from_nbr(nbr, new_nbrs)[MSG_IDX_STATE]
         if state == STATE_LIGHT:
             nbrs_in_light.append(nbr)
     return nbrs_in_light
@@ -123,7 +141,7 @@ def get_nbrs_in_dark():
     nbr_list = hba.get_robot_neighbors()
     nbrs_in_dark = []
     for nbr in nbr_list:
-        state = hba.get_msg_from_nbr(nbr, new_nbrs)[MSG_POS_STATE]
+        state = hba.get_msg_from_nbr(nbr, new_nbrs)[MSG_IDX_STATE]
         if state == STATE_DARK:
             nbrs_in_dark.append(nbr)
     return nbrs_in_dark
@@ -153,21 +171,11 @@ def get_nearest_nbr_in_dark(nbr_list):
 
 def move_in_dir(bearing):
     bearing = math2.normalize_angle(bearing)
-    tv = 0
-    if bearing >= 0:
-        if bearing > math.pi / 2:
-            rv = int(MOTION_RV * (2.0 - bearing * 2.0 / math.pi))
-            tv = int(-MOTION_TV * (-1.0 + bearing * 2.0 / math.pi))
-        else:
-            rv = int(-MOTION_RV * (bearing * 2.0 / math.pi))
-            tv = int(-MOTION_TV * (-1.0 + bearing * 2.0 / math.pi))
-    else:
-        if bearing < -math.pi / 2:
-            rv = int(-MOTION_RV * (2.0 + bearing * 2.0 / math.pi))
-            tv = int(-MOTION_TV * (-1.0 - bearing * 2.0 / math.pi))
-        else:
-            rv = int(MOTION_RV * (-bearing * 2.0 / math.pi))
-            tv = int(-MOTION_TV * (-1.0 - bearing * 2.0 / math.pi))
+    tv = math.cos(bearing) * MOTION_TV
+    rv = math.sin(bearing) * MOTION_RV
+    if abs(bearing) > math.pi / 2:
+        rv = -rv
+    tv, rv = int(tv), int(rv)
     return tv, rv
 
 def self_in_light():
