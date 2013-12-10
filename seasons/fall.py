@@ -137,8 +137,8 @@ def fall():
                 beh_out = (-MOTION_TV, 0, True)
             elif queen == None:
                 beh_out = beh.follow_nbr(nav_tower)
-            elif get_nbr_range_bits(queen) > 2:
-                beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
+            elif neighbors.get_nbr_range_bits(queen) > 2:
+                beh_out = beh.follow_nbr(queen, MOTION_TV)
             elif found_flower:
                 recruit()
             else:
