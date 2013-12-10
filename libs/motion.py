@@ -75,7 +75,8 @@ def set_goal(goal_pos, tv_max):
     global motion_state
     motion_state['motion_done'] = False    
     motion_state['rotate_only'] = True
-    motion_state['goal_pos'] = goal_pos
+    #motion_state['goal_pos'] = goal_pos
+    motion_state['goal_pos'] = (0.0, 0.0)
     motion_state['tv_max'] = tv_max
 
 
