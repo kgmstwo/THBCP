@@ -27,7 +27,8 @@ MSG_IDX_STATE = 0
 
 # Other constants
 LED_BRIGHTNESS = 40
-RANGE_BITS_CLOSE = 3
+
+RANGE_BITS_CLOSE = 4
 NAV_ID = 14 # 125
 INSURANCE_TIME = 5000
 
@@ -155,8 +156,8 @@ def spring():
 
             if recruiter == None:
                 if leader == None:
-                    beh_out = BEH_INACTIVE
-                    if follwers == 5 or sys.time() > start_time + WAIT_TIME:
+                    beh_out = beh.BEH_INACTIVE
+                    if followers == 5 or sys.time() > start_time + WAIT_TIME:
                         followers = 0
                         state = STATE_WANDER
                 else:
