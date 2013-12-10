@@ -166,6 +166,7 @@ def spring():
                         followers = 0
                         state = STATE_WANDER
                 else:
+                    start_time = 0
                     beh_out = beh.follow_nbr(leader, MOTION_TV)
                     if sys.time() > start_time + INSURANCE_TIME:
                         state = STATE_SUCCESS
@@ -182,7 +183,7 @@ def spring():
             leds.set_pattern('g', 'circle', LED_BRIGHTNESS)
             beh_out = beh.BEH_INACTIVE
         # end of the FSM
-        if state not in [STATE_RETURN, STATE_RECRUIT]:
+        if state not in [STATE_IDLE, STATE_RECRUIT, STATE_LEADER, STATE_QUEEN]:
             bump_beh_out = beh.bump_beh(MOTION_TV)
             beh_out = beh.subsume([beh_out, bump_beh_out])
 
