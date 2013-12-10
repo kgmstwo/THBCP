@@ -166,10 +166,12 @@ def spring():
                         followers = 0
                         state = STATE_WANDER
                 else:
-                    start_time = 0
+                    if success:
+                        if sys.time() > start_time + INSURANCE_TIME:
+                            state = STATE_SUCCESS
+                    else:
+                        start_time = sys.time()
                     beh_out = beh.follow_nbr(leader, MOTION_TV)
-                    if sys.time() > start_time + INSURANCE_TIME:
-                        state = STATE_SUCCESS
             else:
                 beh_out = beh.BEH_INACTIVE
 
