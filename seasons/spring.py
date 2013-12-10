@@ -31,7 +31,7 @@ LED_BRIGHTNESS = 40
 RANGE_BITS_CLOSE = 4
 NAV_ID = 14 # 125
 INSURANCE_TIME = 5 * 1000
-WAIT_TIME = 3 * 60 * 1000
+WAIT_TIME = (1/6) * 60 * 1000
 
 def spring():
     tree_pose = None
@@ -108,7 +108,7 @@ def spring():
             
         elif state == STATE_RECRUIT:
             leader = False
-            followers = 0
+            new_followers = 0
             for nbr in nbr_list:
                 nbr_state = hba.get_msg_from_nbr(nbr,new_nbrs)[MSG_IDX_STATE]
                 if nbr_state == STATE_RECRUIT:
@@ -121,7 +121,8 @@ def spring():
             if new_followers > followers:
                 start_time = sys.time()
             if followers == 4 or sys.time() > start_time + WAIT_TIME:
-                motion.set_goal(tree_pose, MOTION_TV)
+                tree_pos = (tree_pose[0], tree_pose[1])
+                motion.set_goal(tree_pos, MOTION_TV)
                 state = STATE_LEADER
 
         elif state == STATE_QUEEN:
