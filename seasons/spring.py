@@ -115,7 +115,7 @@ def spring():
                     start_time = sys.time()
                     state = STATE_RECRUIT
                 elif not closer_to_nbr(queen):
-                    beh_out = beh.follow_nbr(queen, new_nbrs)
+                    beh_out = beh.follow_nbr(queen, MOTION_TV)
                 else:
                     start_time = sys.time()
                     state = STATE_FOLLOW
