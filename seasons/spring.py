@@ -71,14 +71,27 @@ def spring():
        
         elif state == STATE_RETURN:
             nav_tower = hba.find_nav_tower_nbr(NAV_ID)
-            queen = find_queen(nbr_list)
+            queen = None
+            recruiter = None
+            leader = None
+            for nbr in nbr_list:
+                nbr_state = hba.get_msg_from_nbr(nbr, new_nbrs)[MSG_IDX_STATE]
+                if nbr_state is STATE_QUEEN:
+                    queen = nbr
+                elif nbr_state is STATE_RECRUIT:
+                    recruiter = nbr
+                elif nbr_state is STATE_LEADER:
+                    leader = nbr
+            if leader != None:
+                start_time = sys.time()
+                state = STATE_FOLLOW
             if nav_tower is None:
                 beh_out = (-MOTION_TV, 0, True)
             elif queen is None:
                 beh_out = beh.follow_nbr(nav_tower)
             elif not close_to_nbr(queen):
                 beh_out = beh.follow_nbr(queen, MOTION_TV)
-            elif found_tree:
+            elif found_tree and (recruiter is None):
                 start_time = sys.time()
                 state = STATE_RECRUIT
             else:
@@ -101,6 +114,18 @@ def spring():
                 start_time = sys.time()
             if followers = 4 or sys.time() > start_time + WAIT_TIME:
                 state = STATE_LEAD
+
+        elif state is STATE_QUEEN:
+            leader = None
+            for nbr in nbr_list:
+                nbr_state = hba.get_msg_from_nbr(nbr,new_nbrs)[MSG_IDX_STATE]
+                if nbr_state is STATE_LEAD:
+                    leader = nbr
+            if leader is not None:
+                start_time = sys.time()
+                state = STATE_FOLLOW
+            else:
+                beh_out = beh.BEH_INACTIVE
                     
         elif state == STATE_FOLLOW: 
             recruiter = None
@@ -126,7 +151,7 @@ def spring():
                 else:
                     beh_out = beh.follow_nbr(leader)
             else:
-                beh_out = BEH_INACTIVE
+                beh_out = beh.BEH_INACTIVE
 
         elif state == STATE_LEAD:
             beh_out = beh.tvrv(-MOTION_TV, 0)
