@@ -33,6 +33,7 @@ MSG_STATE = 0
 MSG_MY_FLOWER = 1
 
 # Other constants
+NAV_ID = 127
 LED_BRIGHTNESS = 40
 HEADING_ERROR_LIMIT = math.pi / 10
 COLORS = ['red','green','blue']
@@ -79,7 +80,7 @@ def fall():
 
         #FINITE STATE MACHINE
         if state == STATE_IDLE:
-            leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
+            leds.set_pattern('rb', 'group', LED_BRIGHTNESS)
             if rone.button_get_value('r'):
                 state = STATE_MOVE_TO_FLOWER
             if rone.button_get_value('b'):
@@ -88,7 +89,7 @@ def fall():
                 print "idle"
 
         elif state == STATE_WANDER: #run forward, avoid direction of neighbors
-            nav_tower = hba.find_nav_tower_nbr(127)
+            nav_tower = hba.find_nav_tower_nbr(NAV_ID)
             if nav_tower == None:
                 state = STATE_RETURN_TO_BASE
             else:
@@ -129,7 +130,7 @@ def fall():
                 beh_out = beh.tvrv(tv,rv)
 
         elif state == STATE_RETURN_TO_BASE:
-            nav_tower = hba.find_nav_tower_nbr(127)
+            nav_tower = hba.find_nav_tower_nbr(NAV_ID)
             queen = find_queen(nbrList)
             if nav_tower == None:
                 beh_out = (-MOTION_TV, 0, True)
