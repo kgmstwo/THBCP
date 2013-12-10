@@ -20,9 +20,11 @@ STATE_WANDER = 2
 STATE_MOVE_TO_FLOWER = 3
 STATE_COLLECT_POLLEN = 4
 STATE_RETURN_TO_BASE = 5
-STATE_RETURN_TO_FLOWER = 6
+STATE_FOLLOW = 6
 STATE_RECRUIT = 7
 STATE_QUEEN = 8
+STATE_ALIGN = 9
+STATE_GO = 10
 
 # MSG items
 MSG_STATE = 0
@@ -42,23 +44,22 @@ queen_id = 17
 
 def fall(): 
     Found_Flower = False
-    Found_Follower = False
-    collect_pollen_start_time = 0
-    recruit_start_time = 0
-    follow_start_time = 0
-    back_up_start_time = 0
+    start_time = 0
     def wander():
         state = STATE_WANDER
         ri = 0
     def collect_pollen():
         state = STATE_COLLECT_POLLEN
-        collect_pollen_start_time = sys.time()
+        start_time = sys.time()
     def follow():
         state = STATE_FOLLOW
-        follow_start_time = sys.time()
+        start_time = sys.time()
     def recruit():
         state = STATE_RECRUIT
-        recruit_start_time = sys.time()
+        start_time = sys.time()
+    def align_with(nbr):
+        state = STATE_ALIGN
+        start_time = sys.time()
 
     beh.init(0.22, 40, 0.5, 0.1)
     state = STATE_IDLE
@@ -149,20 +150,31 @@ def fall():
                 if sys.time() > (follow_start_time + FOLLOW_TIME):
                     wander()
             else:
-                if True: #aligned with recruiter
-                    state = STATE_GO
-                else:
-                    #write: align with recruiter
-                    pass
+                align_with(recruiter)
+
         elif state == STATE_GO:
             flower = detflower()
             if not flower == None:
                 state = STATE_MOVE_TO_FLOWER
+
         elif state == STATE_RECRUIT:
             if sys.time() > (recruit_start_time + RECRUIT_TIME):
-                follow() #self?
+                align_with(self) #how do you do this?
+
+        elif state == STATE_ALIGN:
+            if True: #aligned with recruiter
+                state = STATE_GO
             else:
-                pass
+                tv = 0
+                (rv, heading_error) = match_nbr_heading(dancing_nbr)
+                beh_out = beh.tvrv(tv, rv)
+                small_error = hba.average_error_check(heading_error, error_list, HEADING_ERROR_LIMIT, new_nbrs)
+                if new_nbrs:
+                    print "error", error_list
+                if small_error:
+                    # We have a good heading match.  Go get pollen!
+                    state = STATE_MOVE_TO_FLOWER
+                    collect_pollen_start_odo = pose.get_odometer()
 
 
         #END OF FINITE STATE MACHINE 
@@ -172,6 +184,13 @@ def fall():
             beh_out = beh.subsume([beh_out, bump_beh_out])
         beh.motion_set(beh_out)
         hba.set_msg(state, 0, 0)
+
+def match_nbr_heading(nbr):
+    nbr_brg = neighbors.get_nbr_bearing(nbr)
+    nbr_ornt = neighbors.get_nbr_orientation(nbr)
+    heading_error = math2.normalize_angle(math.pi + nbr_brg - nbr_ornt)  
+    rv = ROTATE_RV_GAIN * heading_error
+    return (rv, heading_error)
 
 def find_recruiter(nbrList):
     for nbr in nbrList:
