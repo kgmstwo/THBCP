@@ -46,7 +46,12 @@ def spring():
         if new_nbrs:
             print state
         beh_out = beh.BEH_INACTIVE
-            
+
+        color_counts = [0, 0, 0]
+        for i in [0, 1, 2]:
+            color_counts[i] = min([5, (state - 5 * i)])
+        if state not in [STATE_SUCCESS]:
+            leds.set_pattern(color_counts, 'count', LED_BRIGHTNESS)    
         # this is the main finite-state machine
         if state == STATE_IDLE:
             leds.set_pattern('rb', 'group', LED_BRIGHTNESS)
@@ -59,7 +64,7 @@ def spring():
                 state = STATE_QUEEN
                 
         elif state == STATE_WANDER:
-            leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
+##            leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
             nav = hba.find_nav_tower_nbr(NAV_ID)
             beh_out = beh.avoid_nbr(nav, MOTION_TV)
             
@@ -91,7 +96,7 @@ def spring():
                 beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
             elif not close_to_nbr(queen):
                 beh_out = beh.follow_nbr(queen, MOTION_TV)
-            elif found_tree and (recruiter == None):
+            elif (tree_pose != None) and (recruiter == None):
                 start_time = sys.time()
                 state = STATE_RECRUIT
             else:
@@ -116,7 +121,7 @@ def spring():
                 state = STATE_LEADER
 
         elif state == STATE_QUEEN:
-            leds.set_pattern('b', 'circle', LED_BRIGHTNESS)
+##            leds.set_pattern('b', 'circle', LED_BRIGHTNESS)
             leader = None
             for nbr in nbr_list:
                 nbr_state = hba.get_msg_from_nbr(nbr,new_nbrs)[MSG_IDX_STATE]
