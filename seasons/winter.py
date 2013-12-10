@@ -72,15 +72,18 @@ def winter():
                 bearing = math2.normalize_angle(bearing)
                 beh_out = move_in_dir(bearing)
 
-            if (not self_in_light()) and (not manual_control):
-                dark_start_time = sys.time()
-                state = STATE_DARK
-            if manual_control:
-                if rone.button_get_value('b'):
+            if not manual_control:
+                if not self.in_light()
                     dark_start_time = sys.time()
                     state = STATE_DARK
-                elif rone.button_get_value('r'):
-                    state = STATE_IDLE
+                    
+            if rone.button_get_value('b'):
+                manual_control = True
+                dark_start_time = sys.time()
+                state = STATE_DARK
+            elif rone.button_get_value('r'):
+                manual_control = False
+                state = STATE_IDLE
 
         elif state == STATE_DARK:
             leds.set_pattern('b', 'circle', LED_BRIGHTNESS)
@@ -102,12 +105,12 @@ def winter():
                     score_time = hba.winter_time_keeper(initial_time)
                     hba.winter_score_calc(score_time, LED_BRIGHTNESS)
                     state = STATE_DEAD
-            else:
-                if rone.button_get_value('g'):
-                    state = STATE_LIGHT
-                elif rone.button_get_value('r'):
-                    manual_control = False
-                    state = STATE_IDLE
+            if rone.button_get_value('g'):
+                manual_control = True
+                state = STATE_LIGHT
+            elif rone.button_get_value('r'):
+                manual_control = False
+                state = STATE_IDLE
 
         elif state == STATE_DEAD:
             pass
