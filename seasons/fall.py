@@ -12,6 +12,8 @@ import rone, sys, math, math2, velocity, pose, motion, leds, neighbors, beh, hba
 # Basic motion parameters - change carefully
 MOTION_RV = int(1000 * math.pi * 0.3)
 MOTION_TV = 100
+ROTATE_RV_GAIN = 900
+RV_FOLLOW_GAIN = 1.2
 
 # FSM States
 STATE_FLOWER = 0 # don't actually use this
@@ -45,6 +47,8 @@ queen_id = 17
 def fall(): 
     Found_Flower = False
     start_time = 0
+    target_theta = 0
+    my_color = -1
     def wander():
         state = STATE_WANDER
         ri = 0
@@ -57,7 +61,9 @@ def fall():
     def recruit():
         state = STATE_RECRUIT
         start_time = sys.time()
-    def align_with(nbr):
+    def align_with(target):
+        target_theta = target
+        pose.set_pose(0,0,0)
         state = STATE_ALIGN
         start_time = sys.time()
 
@@ -85,10 +91,6 @@ def fall():
         elif state == STATE_WANDER: #run forward, avoid direction of neighbors
             nav_tower = hba.find_nav_tower_nbr(127)
             beh_out = beh.avoid_nbr(nav_tower, MOTION_TV)
-
-            #This might do browninan motion
-            beh_out = (beh_out[0], beh_out[1] + ri)
-            #ri += random.random() * 2 - 1
 
             (flower, color) = detflower(nbrList)
             if flower != None:
@@ -150,7 +152,9 @@ def fall():
                 if sys.time() > (follow_start_time + FOLLOW_TIME):
                     wander()
             else:
-                align_with(recruiter)
+                bearing = neighbors.get_nbr_bearing(recruiter)
+                orientation = neighbors.get_nbr_orientation(recruiter)
+                align_with(math.pi + bearing - orientation)
 
         elif state == STATE_GO:
             flower = detflower()
@@ -159,38 +163,25 @@ def fall():
 
         elif state == STATE_RECRUIT:
             if sys.time() > (recruit_start_time + RECRUIT_TIME):
-                align_with(self) #how do you do this?
+                align_with(pose.get_theta() - math.pi)
 
         elif state == STATE_ALIGN:
-            if True: #aligned with recruiter
+            tv = 0
+            heading_error = math.normalize_angle(pose.get_theta() - target_theta)
+            rv = ROTATE_RV_GAIN * heading_error
+            beh_out = beh.tvrv(tv, rv)
+            small_error = hba.average_error_check(heading_error, error_list, HEADING_ERROR_LIMIT, new_nbrs)
+            if new_nbrs:
+                print "error", error_list
+            if small_error:
                 state = STATE_GO
-            else:
-                tv = 0
-                (rv, heading_error) = match_nbr_heading(dancing_nbr)
-                beh_out = beh.tvrv(tv, rv)
-                small_error = hba.average_error_check(heading_error, error_list, HEADING_ERROR_LIMIT, new_nbrs)
-                if new_nbrs:
-                    print "error", error_list
-                if small_error:
-                    # We have a good heading match.  Go get pollen!
-                    state = STATE_MOVE_TO_FLOWER
-                    collect_pollen_start_odo = pose.get_odometer()
-
-
         #END OF FINITE STATE MACHINE 
 
         bump_beh_out = beh.bump_beh(MOTION_TV)
         if (state != STATE_RETURN_TO_BASE) or (state !=STATE_COLLECT_POLLEN):
             beh_out = beh.subsume([beh_out, bump_beh_out])
         beh.motion_set(beh_out)
-        hba.set_msg(state, 0, 0)
-
-def match_nbr_heading(nbr):
-    nbr_brg = neighbors.get_nbr_bearing(nbr)
-    nbr_ornt = neighbors.get_nbr_orientation(nbr)
-    heading_error = math2.normalize_angle(math.pi + nbr_brg - nbr_ornt)  
-    rv = ROTATE_RV_GAIN * heading_error
-    return (rv, heading_error)
+        hba.set_msg(state, my_color, 0)
 
 def find_recruiter(nbrList):
     for nbr in nbrList:
