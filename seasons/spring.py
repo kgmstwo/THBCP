@@ -29,14 +29,13 @@ MSG_IDX_STATE = 0
 LED_BRIGHTNESS = 40
 RANGE_BITS_CLOSE = 4
 NAV_ID = 14 # 125
-INSURANCE_TIME = 5000
+INSURANCE_TIME = 5 * 1000
+WAIT_TIME = 3 * 60 * 1000
 
 def spring():
     tree_pose = None
     followers = 0
-
     beh.init(0.22, 40, 0.5, 0.1)
-
     state = STATE_IDLE
     
     while True:
