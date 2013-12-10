@@ -120,6 +120,7 @@ def spring():
             beh_out = beh.tvrv(-MOTION_TV, 0)
             if bump_front():
                 state = STATE_SUCCESS
+                
         elif state == STATE_SUCCESS:
             beh_out = beh.BEH_INACTIVE
         # end of the FSM
@@ -136,9 +137,10 @@ def spring():
         hba.set_msg(msg[0], msg[1], msg[2])
 
 # Helper functions
-def light_diff():
-    diff = rone.light_sensor_get_value('fl')-rone.light_sensor_get_value('fr')
-    return diff #positive = right, negative = left
+
+##def light_diff():
+##    diff = rone.light_sensor_get_value('fl')-rone.light_sensor_get_value('fr')
+##    return diff #positive = right, negative = left
 
 ##def go_to_tree(diff_start):
 ##    diff = light_diff() - diff_start
