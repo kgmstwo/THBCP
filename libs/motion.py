@@ -70,6 +70,10 @@ def init():
     motion_state['tv_max'] = 100
     motion_state['goal_pos'] = (0.0, 0.0)
 
+def init_rv(rv_gain, rv_max):
+    global MOTION_RV_MAX, MOTION_RV_GAIN
+    MOTION_RV_GAIN = rv_gain
+    MOTION_RV_MAX = rv_max
 
 def set_goal(goal_pos, tv_max):
     global motion_state

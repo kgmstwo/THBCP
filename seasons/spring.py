@@ -9,7 +9,7 @@ import rone, sys, math, math2, velocity, pose, motion, leds, neighbors, beh, hba
 # This is the code for the Spring season.
 
 # Basic motion parameters - change carefully
-MOTION_RV = int(1000 * math.pi * 0.3)
+MOTION_RV = 100000
 MOTION_TV = 100
 
 # FSM States
@@ -37,6 +37,7 @@ def spring():
     tree_pose = None
     followers = 0
     beh.init(0.22, 40, 0.5, 0.1)
+    motion.init_rv(500, MOTION_RV)
     state = STATE_IDLE
 
     while True:
