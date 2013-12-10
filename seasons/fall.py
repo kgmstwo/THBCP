@@ -77,14 +77,6 @@ def fall():
             print nbrList
         beh_out = beh.BEH_INACTIVE
 
-        if  state != STATE_IDLE and rone.button_get_value('g'):
-            found_flower = False
-            start_time = 0
-            target_theta = 0
-            my_color = -1
-            beh.init(0.22, 40, 0.5, 0.1)
-            state = STATE_IDLE
-
         #FINITE STATE MACHINE
         if state == STATE_IDLE:
             leds.set_pattern('rb', 'group', LED_BRIGHTNESS)
