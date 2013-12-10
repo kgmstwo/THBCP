@@ -157,21 +157,17 @@ def move_in_dir(bearing):
     if bearing >= 0:
         if bearing > math.pi / 2:
             rv = int(-MOTION_RV * (2.0 - bearing * 2.0 / math.pi))
-            if bearing > (math.pi - ANGLE_TOL):
-                tv = -MOTION_TV
+            tv = int(-MOTION_TV * (-1.0 + bearing * 2.0 / math.pi))
         else:
             rv = int(MOTION_RV * (bearing * 2.0 / math.pi))
-            if bearing < ANGLE_TOL:
-                tv = MOTION_TV
+            tv = int(MOTION_TV * (-1.0 + bearing * 2.0 / math.pi))
     else:
         if bearing < -math.pi / 2:
             rv = int(MOTION_RV * (2.0 + bearing * 2.0 / math.pi))
-            if -bearing > (math.pi - ANGLE_TOL):
-                tv = -MOTION_TV
+            tv = int(MOTION_TV * (-1.0 - bearing * 2.0 / math.pi))
         else:
             rv = int(-MOTION_RV * (-bearing * 2.0 / math.pi))
-            if -bearing < ANGLE_TOL:
-                tv = MOTION_TV
+            tv = int(-MOTION_TV * (-1.0 - bearing * 2.0 / math.pi))
     return tv, rv
 
 def self_in_light():
