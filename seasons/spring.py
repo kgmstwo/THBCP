@@ -28,7 +28,7 @@ MSG_IDX_STATE = 0
 # Other constants
 LED_BRIGHTNESS = 40
 RANGE_BITS_CLOSE = 3
-NAV_ID = 125
+NAV_ID = 14 # 125
 INSURANCE_TIME = 5000
 
 def spring():
@@ -86,7 +86,7 @@ def spring():
                 start_time = sys.time()
                 state = STATE_FOLLOW
             elif nav_tower == None:
-                beh_out = (-MOTION_TV, 0, True)
+                beh_out = beh.tvrv(-MOTION_TV, 0)
             elif queen == None:
                 beh_out = beh.follow_nbr(nav_tower, new_nbrs)
             elif not close_to_nbr(queen):
