@@ -157,7 +157,7 @@ def spring():
                     new_followers += 1
             if new_followers > followers:
                 start_time = sys.time()
-            follower = new_followers
+            followers = new_followers
 
             if recruiter == None:
                 if leader == None:
