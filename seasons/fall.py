@@ -52,6 +52,8 @@ def fall():
     my_color = -1
     beh.init(0.22, 40, 0.5, 0.1)
     state = STATE_IDLE
+    color = 'r' #for flowers only
+
     def wander():
         state = STATE_WANDER
     def collect_pollen():
@@ -66,13 +68,16 @@ def fall():
     #motion_start_odo = pose.get_odometer()
 
     while True:
+        beh.init(0.22, 40, 0.5, 0.1)
+        state = STATE_IDLE
+
         new_nbrs = beh.update()
         nbrList = neighbors.get_neighbors()       
         if new_nbrs:
             print nbrList
         beh_out = beh.BEH_INACTIVE
 
-        if rone.button_get_value('g'):
+        if  state != STATE_IDLE and rone.button_get_value('g'):
             found_flower = False
             start_time = 0
             target_theta = 0
@@ -87,8 +92,21 @@ def fall():
                 state = STATE_MOVE_TO_FLOWER
             if rone.button_get_value('b'):
                 state = STATE_QUEEN
+            if rone.button_get_value('g'):
+                state = STATE_FLOWER
             if new_nbrs:
                 print "idle"
+        elif state = STATE_FLOWER:
+            leds.set_pattern(color, 'ramp_slow', LED_BRIGHTNESS)
+            if rone.button_get_value('r'):
+                flower_type = TYPE_RED
+                color = 'r'
+            if rone.button_get_value('g'):
+                flower_type = TYPE_GREEN
+                color = 'g'
+            if rone.button_get_value('b'):
+                flower_type = TYPE_BLUE
+                color = 'b'
 
         elif state == STATE_WANDER: #run forward, avoid direction of neighbors
             nav_tower = hba.find_nav_tower_nbr(NAV_ID)
