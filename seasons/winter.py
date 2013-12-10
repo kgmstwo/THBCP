@@ -34,7 +34,9 @@ def winter():
 
     state = STATE_IDLE
 
-    while True:
+    looping = True
+    
+    while looping:
         # run the system updates
         new_nbrs = beh.update()
         
@@ -45,6 +47,9 @@ def winter():
         # this is the main finite-state machine
         if state == STATE_IDLE:
             leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
+            if new_nbrs:
+                print "idle"
+
             if rone.button_get_value('r'):
                 ##### This is one way to find a cutoff for being in light.
                 ##### Make sure you press the 'r' button when the robot is
@@ -55,8 +60,6 @@ def winter():
                 #####
                 initial_time = sys.time()
                 state = STATE_LIGHT
-            if new_nbrs:
-                print "idle"
 
         elif state == STATE_LIGHT:
             leds.set_pattern('g', 'circle', LED_BRIGHTNESS)
@@ -84,14 +87,15 @@ def winter():
 
             if self_in_light():
                 state = STATE_LIGHT
-
             elif sys.time() - dark_start_time > LIFESPAN:
                 score_time = hba.winter_time_keeper(initial_time)
-                hba.winter_score_calc(score_time, LED_BRIGHTNESS)
                 state = STATE_DEAD
 
         elif state == STATE_DEAD:
-            pass
+            hba.winter_score_calc(score_time, LED_BRIGHTNESS)
+
+            if rone.button_get_value('b'):
+                looping = False
 
         # end of the FSM
 
