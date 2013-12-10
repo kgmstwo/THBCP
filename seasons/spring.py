@@ -34,6 +34,7 @@ NAV_ID = 125
 
 def spring():
     found_tree = False
+    followers = 0
 
     beh.init(0.22, 40, 0.5, 0.1)
 
@@ -85,31 +86,42 @@ def spring():
                 state = STATE_FOLLOW
             
         elif state == STATE_RECRUIT:
-            for nbr in hba.get_robot_neighbors():
-                msg = neighbors.get_nbr_message(nbr)
-                print type(msg)
-                print msg
-                if 'LEADER' in msg:
-                    state = STATE_FOLLOW
-                else:
-                    neighbors.set_message('LEADER')
+            leader = False
+            followers = 0
+            for nbr in nbr_list:
+                nbr_state = hba.get_msg_from_nbr(nbr,new_nbrs)[MSG_IDX_STATE]
+                if nbr_state == STATE_RECRUIT:
+                    if neighbors.get_nbr_id(nbr) > rone.get_id():
+                        state = STATE_FOLLOW
+                elif nbr_state == STATE_LEAD:
+                    leader = True
+                elif nbr_state == STATE_FOLLOW:
+                    new_followers += 1
+            if new_followers > followers:
+                start_time = sys.time()
+            if followers = 4 or sys.time() > start_time + WAIT_TIME:
+                state = STATE_LEAD
                     
         elif state == STATE_FOLLOW: 
             recruiter = None
             leader = None
-            followers = 1
+            new_followers = 1
             for nbr in nbr_list:
-                nbr_state = hba.get_msg_from_nbr(nbr,new_nbrs)[0]
+                nbr_state = hba.get_msg_from_nbr(nbr,new_nbrs)[MSG_IDX_STATE]
                 if nbr_state == STATE_RECRUIT:
                     recruiter = nbr
                 elif nbr_state == STATE_LEAD:
                     leader = nbr
                 elif nbr_state == STATE_FOLLOW or nbr_state == STATE_WANDER:
-                    followers += 1
+                    new_followers += 1
+            if new_followers > followers:
+                start_time = sys.time()
+            follower = new_followers
+
             if recruiter == None:
                 if leader == None:
                     beh_out = BEH_INACTIVE
-                    if follwers == 5:
+                    if follwers == 5 or sys.time() > start_time + WAIT_TIME:
                         state = STATE_WANDER
                 else:
                     beh_out = beh.follow_nbr(leader)
