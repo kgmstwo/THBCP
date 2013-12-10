@@ -112,7 +112,7 @@ def spring():
                     new_followers += 1
             if new_followers > followers:
                 start_time = sys.time()
-            if followers = 4 or sys.time() > start_time + WAIT_TIME:
+            if followers == 4 or sys.time() > start_time + WAIT_TIME:
                 state = STATE_LEAD
 
         elif state is STATE_QUEEN:
@@ -147,6 +147,7 @@ def spring():
                 if leader == None:
                     beh_out = BEH_INACTIVE
                     if follwers == 5 or sys.time() > start_time + WAIT_TIME:
+                        followers = 0
                         state = STATE_WANDER
                 else:
                     beh_out = beh.follow_nbr(leader)
