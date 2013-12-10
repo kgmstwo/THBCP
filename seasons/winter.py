@@ -106,6 +106,7 @@ def winter():
                 if rone.button_get_value('g'):
                     state = STATE_LIGHT
                 elif rone.button_get_value('r'):
+                    manual_control = False
                     state = STATE_IDLE
 
         elif state == STATE_DEAD:
