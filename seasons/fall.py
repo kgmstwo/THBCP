@@ -152,9 +152,9 @@ def fall():
         elif state == STATE_RETURN_TO_BASE:
             nav_tower = hba.find_nav_tower_nbr(NAV_ID)
             queen = find_queen(nbrList)
-            if nav_tower == None:
+            if (nav_tower == None) and (queen == None):
                 beh_out = (-MOTION_TV, 0, True)
-            elif queen == None:
+            elif (nav_tower != None) and (queen == None):
                 beh_out = beh.follow_nbr(nav_tower)
             elif neighbors.get_nbr_range_bits(queen) > 2:
                 beh_out = beh.follow_nbr(queen, MOTION_TV)
