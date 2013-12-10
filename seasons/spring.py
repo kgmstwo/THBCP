@@ -70,7 +70,7 @@ def spring():
         if not state in [STATE_IDLE, STATE_LEADER, STATE_SUCCESS]:
             for nbr in nbr_list:
                 nbr_state = hba.get_msg_from_nbr(nbr, new_nbrs)[MSG_IDX_STATE]
-                if nbr_state is in [STATE_LEADER, STATE_SUCCESS]:
+                if nbr_state in [STATE_LEADER, STATE_SUCCESS]:
                     start_time = sys.time()
                     state = STATE_FOLLOW
             
