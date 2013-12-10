@@ -32,7 +32,7 @@ NAV_ID = 125
 INSURANCE_TIME = 5000
 
 def spring():
-    found_tree = False
+    tree_pose = None
     followers = 0
 
     beh.init(0.22, 40, 0.5, 0.1)
@@ -44,12 +44,12 @@ def spring():
         new_nbrs = beh.update()
         nbr_list = neighbors.get_neighbors()
         if new_nbrs:
-            print nbr_list
+            print state
         beh_out = beh.BEH_INACTIVE
             
         # this is the main finite-state machine
         if state == STATE_IDLE:
-            leds.set_pattern('rb', 'circle', LED_BRIGHTNESS)
+            leds.set_pattern('rb', 'group', LED_BRIGHTNESS)
             if new_nbrs:
                 print "idle"
                 
@@ -59,11 +59,12 @@ def spring():
                 state = STATE_QUEEN
                 
         elif state == STATE_WANDER:
+            leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
             nav = hba.find_nav_tower_nbr(NAV_ID)
             beh_out = beh.avoid_nbr(nav, MOTION_TV)
             
             if bump_front():
-                found_tree = True
+                tree_pose = pose.get_pose()
                 state = STATE_RETURN
             elif nav is None:
                 state = STATE_RETURN
@@ -84,10 +85,10 @@ def spring():
             if leader != None:
                 start_time = sys.time()
                 state = STATE_FOLLOW
-            if nav_tower is None:
+            elif nav_tower is None:
                 beh_out = (-MOTION_TV, 0, True)
             elif queen is None:
-                beh_out = beh.follow_nbr(nav_tower)
+                beh_out = beh.follow_nbr(nav_tower, new_nbrs)
             elif not close_to_nbr(queen):
                 beh_out = beh.follow_nbr(queen, MOTION_TV)
             elif found_tree and (recruiter is None):
@@ -115,6 +116,7 @@ def spring():
                 state = STATE_LEAD
 
         elif state is STATE_QUEEN:
+            leds.set_pattern('b', 'circle', LED_BRIGHTNESS)
             leader = None
             for nbr in nbr_list:
                 nbr_state = hba.get_msg_from_nbr(nbr,new_nbrs)[MSG_IDX_STATE]
@@ -160,11 +162,12 @@ def spring():
                 beh_out = beh.BEH_INACTIVE
 
         elif state == STATE_LEAD:
-            beh_out = beh.tvrv(-MOTION_TV, 0)
-            if bump_front():
+            motion.set_goal(tree_pose)
+            if motion.is_done():
                 state = STATE_SUCCESS
                 
         elif state == STATE_SUCCESS:
+            leds.set_pattern('g', 'circle', LED_BRIGHTNESS)
             beh_out = beh.BEH_INACTIVE
         # end of the FSM
         if state not in [STATE_RETURN, STATE_RECRUIT]:
