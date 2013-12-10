@@ -46,7 +46,7 @@ BACK_UP_TIME = 1000
 TURN_TIME = 1700
 
 def fall(): 
-    def restart()
+    def restart():
         found_flower = False
         start_time = 0
         target_theta = 0
