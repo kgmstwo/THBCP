@@ -12,6 +12,11 @@ import rone, sys, math, math2, velocity, pose, motion, leds, neighbors, beh, hba
 MOTION_RV = 100000
 MOTION_TV = 100
 
+MOTION_CAPTURE_DISTANCE = 16
+MOTION_RELEASE_DISTANCE = 32
+MOTION_CAPTURE_ANGLE = math.pi/2
+MOTION_RELEASE_ANGLE = math.pi/10
+
 # FSM States
 STATE_IDLE = 0
 STATE_QUEEN = 1
@@ -37,7 +42,8 @@ def spring():
     tree_pose = None
     followers = 0
     beh.init(0.22, 40, 0.5, 0.1)
-    motion.init_rv(500, MOTION_RV)
+    motion.init_rv(1000, MOTION_RV, MOTION_CAPTURE_DISTANCE, MOTION_RELEASE_DISTANCE
+            , MOTION_CAPTURE_ANGLE, MOTION_RELEASE_ANGLE)
     state = STATE_IDLE
 
     while True:

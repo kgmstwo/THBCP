@@ -70,10 +70,17 @@ def init():
     motion_state['tv_max'] = 100
     motion_state['goal_pos'] = (0.0, 0.0)
 
-def init_rv(rv_gain, rv_max):
+def init_rv(rv_gain, rv_max, c_distance, r_distance, c_angle, r_angle):
     global MOTION_RV_MAX, MOTION_RV_GAIN
+    global MOTION_CAPTURE_DISTANCE, MOTION_RELEASE_ANGLE
+    global MOTION_CAPTURE_ANGLE, MOTION_RELEASE_ANGLE
     MOTION_RV_GAIN = rv_gain
     MOTION_RV_MAX = rv_max
+    MOTION_CAPTURE_DISTANCE = c_angle
+    MOTION_RELEASE_DISTANCE = r_angle
+    MOTION_CAPTURE_ANGLE = c_angle
+    MOTION_RELEASE_ANGLE = r_angle
+
 
 def set_goal(goal_pos, tv_max):
     global motion_state
