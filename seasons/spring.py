@@ -134,7 +134,7 @@ def spring():
                     new_followers += 1
             if new_followers > followers:
                 start_time = sys.time()
-            followers = new_followers
+            followers = max([followers, new_followers])
             if followers == 4 or sys.time() > start_time + WAIT_TIME:
                 tree_pos = (tree_pose[0], tree_pose[1])
                 motion.set_goal(tree_pos, MOTION_TV)
@@ -157,8 +157,9 @@ def spring():
                 elif nbr_state in [STATE_FOLLOW, STATE_WANDER]:
                     new_followers += 1
             if new_followers > followers:
+                print 'problem is new_followers
                 start_time = sys.time()
-            followers = new_followers
+            followers = max([followers, new_followers])
 
             if recruiter == None:
                 if leader == None:
@@ -170,6 +171,7 @@ def spring():
                         if sys.time() > start_time + INSURANCE_TIME:
                             state = STATE_SUCCESS
                     else:
+                        print 'yo mama'
                         start_time = sys.time()
                     beh_out = beh.follow_nbr(leader, MOTION_TV)
             else:
@@ -190,7 +192,7 @@ def spring():
         
         # end of the FSM
         
-        if state not in [STATE_IDLE, STATE_RECRUIT, STATE_LEADER, STATE_QUEEN]:
+        if state not in [STATE_IDLE, STATE_RECRUIT, STATE_LEADER, STATE_SUCCESS, STATE_QUEEN]:
             bump_beh_out = beh.bump_beh(MOTION_TV)
             beh_out = beh.subsume([beh_out, bump_beh_out])
 
