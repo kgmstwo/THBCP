@@ -54,7 +54,7 @@ def winter():
                 ##### in the light!
                 global BRIGHTNESS_THRESHOLDS
                 for sensor_dir in BRIGHTNESS_THRESHOLDS.keys():
-                    BRIGHTNESS_THRESHOLDS[sensor_dir] = 0.75 * rone.light_sensor_get_value(sensor_dir)
+                    BRIGHTNESS_THRESHOLDS[sensor_dir] = 0.85 * rone.light_sensor_get_value(sensor_dir)
                 #####
                 initial_time = sys.time()
                 state = STATE_LIGHT

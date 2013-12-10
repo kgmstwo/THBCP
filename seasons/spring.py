@@ -35,7 +35,7 @@ LED_BRIGHTNESS = 40
 
 RANGE_BITS_CLOSE = 3
 RANGE_BITS_CLOSER = 4
-NAV_ID = 14 # 125 # 127
+NAV_ID = 125 # 127
 INSURANCE_TIME = 5 * 1000
 WAIT_TIME = int((6.0/6) * 60 * 1000)
 
@@ -98,12 +98,20 @@ def spring():
             ##            leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
             nav = hba.find_nav_tower_nbr(NAV_ID)
             beh_out = beh.avoid_nbr(nav, MOTION_TV)
+            queen = None
+            for nbr in nbr_list:
+                nbr_state = hba.get_msg_from_nbr(nbr, new_nbrs)[MSG_IDX_STATE]
+                if nbr_state == STATE_QUEEN:
+                    queen = nbr
 
             if bump_front():
-                tree_pose = pose.get_pose()
-                motion.set_goal((0.0, 0.0), MOTION_TV)
-                at_tree_odo = pose.get_odometer()
-                state = STATE_RETURN
+                if queen != None:
+                    state = STATE_SUCCESS
+                else:
+                    tree_pose = pose.get_pose()
+                    motion.set_goal((0.0, 0.0), MOTION_TV)
+                    at_tree_odo = pose.get_odometer()
+                    state = STATE_RETURN
             elif nav == None:
                 motion.set_goal((0.0, 0.0), MOTION_TV)
                 state = STATE_RETURN
