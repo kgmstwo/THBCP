@@ -100,11 +100,12 @@ def fall():
         elif state == STATE_MOVE_TO_FLOWER:
             leds.set_pattern('b', 'ramp_slow', LED_BRIGHTNESS)
             (flower, color) = detflower(nbrList)
-            if (neighbors.get_nbr_range_bits(flower) > 6) or (beh.bump_angle_get() != None):
-                collect_pollen() #collect pollen if we bump or get close
-            else:
+            if flower != None:
+                if (neighbors.get_nbr_range_bits(flower) > 6) or (beh.bump_angle_get() != None):
+                    collect_pollen() #collect pollen if we bump or get close
+                else:
                 #otherwise keep following that flower
-                beh_out = beh.follow_nbr(flower, MOTION_TV)
+                    beh_out = beh.follow_nbr(flower, MOTION_TV)
 
         elif state == STATE_COLLECT_POLLEN:
             motion_start_odo = pose.get_odometer()
@@ -197,6 +198,7 @@ def find_queen(nbrList):
     return None
 
 def detflower(nbrList):
+    new_nbr = 1
     for nbr in nbrList:
         (state, asdf, color) = hba.get_msg_from_nbr(nbr,new_nbr)
         if state == STATE_FLOWER:
