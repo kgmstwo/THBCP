@@ -69,7 +69,6 @@ def fall():
 
     while True:
         beh.init(0.22, 40, 0.5, 0.1)
-        state = STATE_IDLE
 
         new_nbrs = beh.update()
         nbrList = neighbors.get_neighbors()       
