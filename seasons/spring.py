@@ -19,7 +19,7 @@ STATE_WANDER = 2
 STATE_RETURN = 3
 STATE_RECRUIT = 4
 STATE_FOLLOW = 5
-STATE_LEAD = 6
+STATE_LEADER = 6
 STATE_SUCCESS = 7
 
 # MSG indexes
@@ -106,21 +106,21 @@ def spring():
                 if nbr_state == STATE_RECRUIT:
                     if neighbors.get_nbr_id(nbr) > rone.get_id():
                         state = STATE_FOLLOW
-                elif nbr_state == STATE_LEAD:
+                elif nbr_state == STATE_LEADER:
                     leader = True
                 elif nbr_state == STATE_FOLLOW:
                     new_followers += 1
             if new_followers > followers:
                 start_time = sys.time()
             if followers == 4 or sys.time() > start_time + WAIT_TIME:
-                state = STATE_LEAD
+                state = STATE_LEADER
 
         elif state == STATE_QUEEN:
             leds.set_pattern('b', 'circle', LED_BRIGHTNESS)
             leader = None
             for nbr in nbr_list:
                 nbr_state = hba.get_msg_from_nbr(nbr,new_nbrs)[MSG_IDX_STATE]
-                if nbr_state == STATE_LEAD:
+                if nbr_state == STATE_LEADER:
                     leader = nbr
             if leader != None:
                 start_time = sys.time()
@@ -137,7 +137,7 @@ def spring():
                 nbr_state = hba.get_msg_from_nbr(nbr,new_nbrs)[MSG_IDX_STATE]
                 if nbr_state == STATE_RECRUIT:
                     recruiter = nbr
-                elif nbr_state == STATE_LEAD:
+                elif nbr_state == STATE_LEADER:
                     leader = nbr
                 elif nbr_state == STATE_SUCCESS:
                     leader = nbr
@@ -161,7 +161,7 @@ def spring():
             else:
                 beh_out = beh.BEH_INACTIVE
 
-        elif state == STATE_LEAD:
+        elif state == STATE_LEADER:
             motion.set_goal(tree_pose)
             if motion.is_done():
                 state = STATE_SUCCESS
