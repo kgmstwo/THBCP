@@ -9,11 +9,11 @@ import rone, sys, math, math2, velocity, pose, motion, leds, neighbors, beh, hba
 # This is the code for the Spring season.
 
 # Basic motion parameters - change carefully
-MOTION_RV = 100000
+MOTION_RV = 1300
 MOTION_TV = 100
 
-MOTION_CAPTURE_DISTANCE = 16
-MOTION_RELEASE_DISTANCE = 32
+MOTION_CAPTURE_DISTANCE = 16 * 20
+MOTION_RELEASE_DISTANCE = 32 * 20
 MOTION_CAPTURE_ANGLE = math.pi/2
 MOTION_RELEASE_ANGLE = math.pi/10
 
