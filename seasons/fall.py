@@ -30,6 +30,7 @@ STATE_GO = 10
 
 # MSG items
 MSG_STATE = 0
+MSG_MY_FLOWER = 1
 
 # Other constants
 LED_BRIGHTNESS = 40
@@ -46,7 +47,7 @@ TURN_TIME = 1700
 queen_id = 17
 
 def fall(): 
-    Found_Flower = False
+    found_flower = False
     start_time = 0
     target_theta = 0
     my_color = -1
@@ -112,7 +113,7 @@ def fall():
             motion_start_odo = pose.get_odometer()
             if sys.time() > (collect_pollen_start_time + COLLECT_POLLEN_TIME):
                 state = STATE_RETURN_TO_BASE
-                Found_Flower = True
+                found_flower = True
             elif sys.time() < (collect_pollen_start_time + BACK_UP_TIME):    
                 tv = -MOTION_TV
                 rv = 0
@@ -138,7 +139,7 @@ def fall():
                 beh_out = beh.follow_nbr(nav_tower)
             elif get_nbr_range_bits(queen) > 2:
                 beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
-            elif Found_Flower:
+            elif found_flower:
                 recruit()
             else:
                 follow()
@@ -177,7 +178,7 @@ def fall():
         #END OF FINITE STATE MACHINE 
 
         bump_beh_out = beh.bump_beh(MOTION_TV)
-        if (state != STATE_RETURN_TO_BASE) or (state !=STATE_COLLECT_POLLEN):
+        if state not in [STATE_RETURN_TO_BASE, STATE_COLLECT_POLLEN, STATE_RECRUIT]:
             beh_out = beh.subsume([beh_out, bump_beh_out])
         beh.motion_set(beh_out)
         hba.set_msg(state, my_color, 0)
