@@ -33,8 +33,8 @@ MSG_IDX_STATE = 0
 # Other constants
 LED_BRIGHTNESS = 40
 
-RANGE_BITS_CLOSE = 2
-RANGE_BITS_CLOSER = 3
+RANGE_BITS_CLOSE = 3
+RANGE_BITS_CLOSER = 4
 NAV_ID = 14 # 125 # 127
 INSURANCE_TIME = 5 * 1000
 WAIT_TIME = int((3.0/6) * 60 * 1000)
@@ -67,7 +67,7 @@ def spring():
         else:
             leds.set_pattern(color_counts, 'count', LED_BRIGHTNESS)
 
-        if not state in [STATE_IDLE, STATE_LEADER, STATE_SUCCESS]:
+        if not state in [STATE_IDLE, STATE_LEADER, STATE_SUCCESS, STATE_FOLLOW]:
             for nbr in nbr_list:
                 nbr_state = hba.get_msg_from_nbr(nbr, new_nbrs)[MSG_IDX_STATE]
                 if nbr_state in [STATE_LEADER, STATE_SUCCESS]:
@@ -158,7 +158,6 @@ def spring():
                 elif nbr_state in [STATE_FOLLOW, STATE_WANDER]:
                     new_followers += 1
             if new_followers > followers:
-                print 'problem is new_followers
                 start_time = sys.time()
             followers = max([followers, new_followers])
 
@@ -172,7 +171,6 @@ def spring():
                         if sys.time() > start_time + INSURANCE_TIME:
                             state = STATE_SUCCESS
                     else:
-                        print 'yo mama'
                         start_time = sys.time()
                     beh_out = beh.follow_nbr(leader, MOTION_TV)
             else:
