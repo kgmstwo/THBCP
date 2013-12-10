@@ -88,7 +88,7 @@ def spring():
             elif nav_tower == None:
                 beh_out = beh.tvrv(-MOTION_TV, 0)
             elif queen == None:
-                beh_out = beh.follow_nbr(nav_tower, new_nbrs)
+                beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
             elif not close_to_nbr(queen):
                 beh_out = beh.follow_nbr(queen, MOTION_TV)
             elif found_tree and (recruiter == None):
@@ -155,7 +155,7 @@ def spring():
                         followers = 0
                         state = STATE_WANDER
                 else:
-                    beh_out = beh.follow_nbr(leader)
+                    beh_out = beh.follow_nbr(leader, MOTION_TV)
                     if sys.time() > start_time + INSURANCE_TIME:
                         state = STATE_SUCCESS
             else:
