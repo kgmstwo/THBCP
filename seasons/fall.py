@@ -46,13 +46,12 @@ BACK_UP_TIME = 1000
 TURN_TIME = 1700
 
 def fall(): 
-    def restart():
-        found_flower = False
-        start_time = 0
-        target_theta = 0
-        my_color = -1
-        beh.init(0.22, 40, 0.5, 0.1)
-        state = STATE_IDLE
+    found_flower = False
+    start_time = 0
+    target_theta = 0
+    my_color = -1
+    beh.init(0.22, 40, 0.5, 0.1)
+    state = STATE_IDLE
     def wander():
         state = STATE_WANDER
     def collect_pollen():
@@ -64,8 +63,6 @@ def fall():
         state = STATE_ALIGN
         start_time = sys.time()
 
-    restart()
-
     #motion_start_odo = pose.get_odometer()
 
     while True:
@@ -76,7 +73,12 @@ def fall():
         beh_out = beh.BEH_INACTIVE
 
         if rone.button_get_value('g'):
-            restart()
+            found_flower = False
+            start_time = 0
+            target_theta = 0
+            my_color = -1
+            beh.init(0.22, 40, 0.5, 0.1)
+            state = STATE_IDLE
 
         #FINITE STATE MACHINE
         if state == STATE_IDLE:
