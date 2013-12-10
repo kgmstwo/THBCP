@@ -37,7 +37,7 @@ RANGE_BITS_CLOSE = 2
 RANGE_BITS_CLOSER = 4
 NAV_ID = 14 # 125 # 127
 INSURANCE_TIME = 5 * 1000
-WAIT_TIME = int((1.0/6) * 60 * 1000)
+WAIT_TIME = int((3.0/6) * 60 * 1000)
 
 def spring():
     tree_pose = None
@@ -133,9 +133,10 @@ def spring():
                 elif nbr_state in [STATE_FOLLOW, STATE_QUEEN]:
                     new_followers += 1
             if new_followers > followers:
+                print 'reset timer'
                 start_time = sys.time()
             followers = new_followers
-            if followers == 4 or sys.time() > start_time + WAIT_TIME:
+            if (followers == 4) or (sys.time() > start_time + WAIT_TIME):
                 tree_pos = (tree_pose[0], tree_pose[1])
                 motion.set_goal(tree_pos, MOTION_TV)
                 state = STATE_LEADER
