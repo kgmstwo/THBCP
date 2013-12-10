@@ -40,6 +40,7 @@ INSURANCE_TIME = 5 * 1000
 WAIT_TIME = int((3.0/6) * 60 * 1000)
 
 def spring():
+    at_tree_odo = None
     tree_pose = None
     followers = 0
     have_seen_leader = False
@@ -101,6 +102,7 @@ def spring():
             if bump_front():
                 tree_pose = pose.get_pose()
                 motion.set_goal((0.0, 0.0), MOTION_TV)
+                at_tree_odo = pose.get_odometer()
                 state = STATE_RETURN
             elif nav == None:
                 motion.set_goal((0.0, 0.0), MOTION_TV)
@@ -120,6 +122,8 @@ def spring():
                 if (recruiter == None) and (tree_pose != None) and \
                 close_to_nbr(queen):
                     start_time = sys.time()
+                    dist_traveled = pose.get_odometer() - at_tree_odo
+                    at_queen_odo = pose.get_odometer()
                     state = STATE_RECRUIT
                 elif not closer_to_nbr(queen):
                     beh_out = beh.follow_nbr(queen, MOTION_TV)
@@ -178,15 +182,10 @@ def spring():
                         followers = 0
                         state = STATE_WANDER
                 else:
-                    if success:
-                        if sys.time() > start_time + INSURANCE_TIME:
-                            state = STATE_SUCCESS
-                    else:
-                        start_time = sys.time()
+                    if success and bump() and close_to_nbr(leader):
+                        state = STATE_SUCCESS
                     beh_out = beh.follow_nbr(leader, MOTION_TV)
-            else:
-                beh_out = beh.BEH_INACTIVE
-
+            
         elif state == STATE_LEADER:
 ##            (tv, rv) = motion.update()
 ##            beh_out = beh.tvrv(tv, rv)
@@ -194,7 +193,7 @@ def spring():
 ##                state = STATE_SUCCESS
             beh_out = beh.tvrv(-MOTION_TV, 0)
 
-            if bump():
+            if bump() or (pose.get_odometer() - at_queen_odo) > dist_traveled:
                 state = STATE_SUCCESS
 
         elif state == STATE_SUCCESS:
