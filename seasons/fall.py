@@ -33,7 +33,7 @@ MSG_STATE = 0
 MSG_MY_FLOWER = 1
 
 # Other constants
-NAV_ID = 127
+NAV_ID = 125
 LED_BRIGHTNESS = 40
 HEADING_ERROR_LIMIT = math.pi / 10
 COLORS = ['red','green','blue']
