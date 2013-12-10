@@ -96,7 +96,7 @@ def fall():
                 state = STATE_FLOWER
             if new_nbrs:
                 print "idle"
-        elif state = STATE_FLOWER:
+        elif state == STATE_FLOWER:
             leds.set_pattern(color, 'ramp_slow', LED_BRIGHTNESS)
             if rone.button_get_value('r'):
                 flower_type = TYPE_RED
