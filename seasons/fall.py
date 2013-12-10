@@ -51,7 +51,6 @@ def fall():
     my_color = -1
     def wander():
         state = STATE_WANDER
-        ri = 0
     def collect_pollen():
         state = STATE_COLLECT_POLLEN
         start_time = sys.time()
@@ -100,8 +99,7 @@ def fall():
             leds.set_pattern('b', 'ramp_slow', LED_BRIGHTNESS)
             (flower, color) = detflower(nbrList)
             if (neighbors.get_nbr_range_bits(flower) > 6) or (beh.bump_angle_get() != None):
-                #collect pollen if we bump or get close
-                collect_pollen()
+                collect_pollen() #collect pollen if we bump or get close
             else:
                 #otherwise keep following that flower
                 beh_out = beh.follow_nbr(flower, MOTION_TV)
