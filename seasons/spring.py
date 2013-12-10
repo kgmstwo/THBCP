@@ -37,30 +37,33 @@ def spring():
     beh.init(0.22, 40, 0.5, 0.1)
 
     state = STATE_IDLE
+
+    light_diff_start = light_diff()
     
     while True:
         # run the system updates
         new_nbrs = beh.update()
-        diff_start = light_diff()
-        nbrList = neighbors.get_neighbors()
+        nbr_list = neighbors.get_neighbors()
         if new_nbrs:
-            print nbrList
+            print nbr_list
         beh_out = beh.BEH_INACTIVE
             
         # this is the main finite-state machine
         if state == STATE_IDLE:
-            leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
-            if rone.button_get_value('r'):
-                state = STATE_WANDER
+            leds.set_pattern('rb', 'circle', LED_BRIGHTNESS)
             if new_nbrs:
                 print "idle"
                 
+            if rone.button_get_value('r'):
+                state = STATE_WANDER
+            elif rone.button_get_value('b'):
+                state = STATE_QUEEN
+                
         elif state == STATE_WANDER:
-            if tree_detect(diff_start) == True:
+            if bump_front():
                 Found_Tree = True
                 state = STATE_RETURN
-            elif pose.get_odometer() > WANDER:
-                state = STATE_RETURN
+            elif 
             else:
                 nav = hba.find_nav_tower_nbr(125)
                 beh_out = beh.avoid_nbr(nav, MOTION_TV) # avoid navtower
@@ -151,6 +154,10 @@ def tree_detect(diff_start):
     tree = False
     if rone.bump_sensors_get_value(1) == 1:
         tree = True
+
+def bump_front():
+    bump_bits = rone.bump_sensors_get_value()
+    return bump_front_get_value(bump_bits)
 
 # Start!
 spring()
