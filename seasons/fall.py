@@ -90,11 +90,14 @@ def fall():
 
         elif state == STATE_WANDER: #run forward, avoid direction of neighbors
             nav_tower = hba.find_nav_tower_nbr(127)
-            beh_out = beh.avoid_nbr(nav_tower, MOTION_TV)
+            if nav_tower == None:
+                state = STATE_RETURN_TO_BASE
+            else:
+                beh_out = beh.avoid_nbr(nav_tower, MOTION_TV)
 
-            (flower, color) = detflower(nbrList)
-            if flower != None:
-                state = STATE_MOVE_TO_FLOWER
+                (flower, color) = detflower(nbrList)
+                if flower != None:
+                    state = STATE_MOVE_TO_FLOWER
 
         elif state == STATE_MOVE_TO_FLOWER:
             leds.set_pattern('b', 'ramp_slow', LED_BRIGHTNESS)
@@ -129,20 +132,16 @@ def fall():
         elif state == STATE_RETURN_TO_BASE:
             nav_tower = hba.find_nav_tower_nbr(127)
             queen = find_queen(nbrList)
-            new_nbrs = beh.update()
             if nav_tower == None:
-                wander() #we're in trouble
+                beh_out = (-MOTION_TV, 0, True)
+            elif queen == None:
+                beh_out = beh.follow_nbr(nav_tower)
+            elif get_nbr_range_bits(queen) > 2:
+                beh_out = beh.follow_nbr(nav_tower, MOTION_TV)
+            elif Found_Flower:
+                recruit()
             else:
-                if queen == None:
-                    beh_out = beh.follow_nbr(nav_tower) #just follow the nav tower
-                else:
-                    if get_nbr_range_bits(queen) > 2:
-                        beh_out = beh.follow_nbr(nav_tower, MOTION_TV) #get closer to the queen
-                    else:
-                        if Found_Flower:
-                            recruit()
-                        else:
-                            follow()
+                follow()
 
         elif state == STATE_FOLLOW:
             recruiter = find_recruiter()
