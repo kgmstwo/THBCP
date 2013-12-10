@@ -70,14 +70,21 @@ def spring():
        
         elif state == STATE_RETURN:
             nav_tower = hba.find_nav_tower_nbr(NAV_ID)
-            queen = find_queen(nbr_list)
+            queen = None
+            recruiter = None
+            for nbr in nbr_list:
+                nbr_state = hba.get_msg_from_nbr(nbr, new_nbrs)[MSG_IDX_STATE]
+                if nbr_state is STATE_QUEEN:
+                    queen = nbr
+                elif nbr_state is STATE_RECRUIT:
+                    recruiter = nbr
             if nav_tower is None:
                 beh_out = (-MOTION_TV, 0, True)
             elif queen is None:
                 beh_out = beh.follow_nbr(nav_tower)
             elif not close_to_nbr(queen):
                 beh_out = beh.follow_nbr(queen, MOTION_TV)
-            elif found_tree:
+            elif found_tree and (recruiter is None):
                 start_time = sys.time()
                 state = STATE_RECRUIT
             else:
@@ -99,7 +106,7 @@ def spring():
             leader = None
             followers = 1
             for nbr in nbr_list:
-                nbr_state = hba.get_msg_from_nbr(nbr,new_nbrs)[0]
+                nbr_state = hba.get_msg_from_nbr(nbr,new_nbrs)[MSG_IDX_STATE]
                 if nbr_state == STATE_RECRUIT:
                     recruiter = nbr
                 elif nbr_state == STATE_LEAD:
