@@ -42,6 +42,7 @@ WAIT_TIME = int((3.0/6) * 60 * 1000)
 def spring():
     tree_pose = None
     followers = 0
+    have_seen_leader = False
     beh.init(0.22, 40, 0.5, 0.1)
     motion.init_rv(1000, MOTION_RV, MOTION_CAPTURE_DISTANCE, MOTION_RELEASE_DISTANCE
             , MOTION_CAPTURE_ANGLE, MOTION_RELEASE_ANGLE)
@@ -67,14 +68,20 @@ def spring():
         else:
             leds.set_pattern(color_counts, 'count', LED_BRIGHTNESS)
 
+        if rone.button_get_value('g'):
+            tree_pose = None
+            followers = 0
+            have_seen_leader = False
+            state = STATE_IDLE
+            
+        # this is the main finite-state machine
         if not state in [STATE_IDLE, STATE_LEADER, STATE_SUCCESS, STATE_FOLLOW]:
             for nbr in nbr_list:
                 nbr_state = hba.get_msg_from_nbr(nbr, new_nbrs)[MSG_IDX_STATE]
                 if nbr_state in [STATE_LEADER, STATE_SUCCESS]:
                     start_time = sys.time()
                     state = STATE_FOLLOW
-            
-        # this is the main finite-state machine
+                    
         if state == STATE_IDLE:
 
             if rone.button_get_value('r'):
@@ -157,13 +164,17 @@ def spring():
                     success = True
                 elif nbr_state in [STATE_FOLLOW, STATE_WANDER]:
                     new_followers += 1
+            if success:
+                have_seen_leader = True
             if new_followers > followers:
                 start_time = sys.time()
             followers = max([followers, new_followers])
 
             if recruiter == None:
                 if leader == None:
-                    if followers == 5 or sys.time() > start_time + WAIT_TIME:
+                    if have_seen_leader:
+                        beh_out = beh.tvrv(MOTION_TV, 0)
+                    elif followers == 5 or sys.time() > start_time + WAIT_TIME:
                         followers = 0
                         state = STATE_WANDER
                 else:
