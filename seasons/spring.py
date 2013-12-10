@@ -37,7 +37,7 @@ RANGE_BITS_CLOSE = 3
 RANGE_BITS_CLOSER = 4
 NAV_ID = 14 # 125 # 127
 INSURANCE_TIME = 5 * 1000
-WAIT_TIME = int((3.0/6) * 60 * 1000)
+WAIT_TIME = int((6.0/6) * 60 * 1000)
 
 def spring():
     at_tree_odo = None
