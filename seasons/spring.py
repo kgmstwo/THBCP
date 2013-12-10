@@ -71,10 +71,10 @@ def spring():
             
             if bump_front():
                 tree_pose = pose.get_pose()
-                motion.set_goal([0, 0], MOTION_TV)
+                motion.set_goal((0, 0), MOTION_TV)
                 state = STATE_RETURN
             elif nav == None:
-                motion.set_goal([0, 0], MOTION_TV)
+                motion.set_goal((0, 0), MOTION_TV)
                 state = STATE_RETURN
        
         elif state == STATE_RETURN:
