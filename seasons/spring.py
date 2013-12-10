@@ -28,7 +28,7 @@ MSG_IDX_STATE = 0
 # Other constants
 LED_BRIGHTNESS = 40
 RANGE_BITS_CLOSE = 3
-NAV_ID = 125
+NAV_ID = 14
 INSURANCE_TIME = 5000
 
 def spring():
