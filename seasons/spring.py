@@ -110,7 +110,8 @@ def spring():
                 elif nbr_state == STATE_RECRUIT:
                     recruiter = nbr
             if queen != None:
-                if (recruiter == None) and (tree_pose != None):
+                if (recruiter == None) and (tree_pose != None) and \
+                close_to_nbr(queen):
                     start_time = sys.time()
                     state = STATE_RECRUIT
                 elif not closer_to_nbr(queen):
