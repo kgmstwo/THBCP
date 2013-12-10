@@ -99,23 +99,33 @@ def spring():
                     neighbors.set_message('LEADER')
                     
         elif state == STATE_FOLLOW: 
-            for nbr in nbrList:
-                msg = neighbors.get_nbr_message(nbr)
-                if 'LEADER' in msg:
-                    nbr = LEADER
-            nbr_bearing = neighbors.get_nbr_bearing(LEADER)
-            nbr_orientation = neighbors.get_nbr_orientation(LEADER)
-            nbr_heading = math2.normalize_angle(math.pi + nbr_bearing - nbr_orientation) + math.pi 
-            
-            if nbr_heading > 2: 
-                beh_out = beh.tvrv(0, MOTION_RV)
-            
-            elif nbr_heading < 2:
-                beh_out = beh.tvrv(0,-MOTION_RV)
-            
+            recruiter = None
+            leader = None
+            followers = 1
+            for nbr in nbr_list:
+                nbr_state = hba.get_msg_from_nbr(nbr,new_nbrs)[0]
+                if nbr_state == STATE_RECRUIT:
+                    recruiter = nbr
+                elif nbr_state == STATE_LEAD:
+                    leader = nbr
+                elif nbr_state == STATE_FOLLOW or nbr_state == STATE_WANDER:
+                    followers += 1
+            if recruiter == None:
+                if leader == None:
+                    beh_out = BEH_INACTIVE
+                    if follwers == 5:
+                        state = STATE_WANDER
+                else:
+                    beh_out = beh.follow_nbr(leader)
             else:
-                beh_out = beh.tvrv(MOTION_TV,0)
-                
+                beh_out = BEH_INACTIVE
+
+        elif state == STATE_LEAD:
+            beh_out = beh.tvrv(-MOTION_TV, 0)
+            if bump_front():
+                state = STATE_SUCCESS
+        elif state == STATE_SUCCESS:
+            beh_out = beh.BEH_INACTIVE
         # end of the FSM
         if state not in [STATE_RETURN, STATE_RECRUIT]:
             bump_beh_out = beh.bump_beh(MOTION_TV)
