@@ -112,7 +112,7 @@ def spring():
             if queen != None:
                 if (recruiter == None) and (tree_pose != None):
                     start_time = sys.time()
-                    state = STATE_RECRUITER
+                    state = STATE_RECRUIT
                 elif not closer_to_nbr(queen):
                     beh_out = beh.follow_nbr(queen)
                 else:
