@@ -73,7 +73,7 @@ def winter():
                 beh_out = move_in_dir(bearing)
 
             if not manual_control:
-                if not self_in_light()
+                if not self_in_light():
                     dark_start_time = sys.time()
                     state = STATE_DARK
                     
