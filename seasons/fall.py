@@ -44,23 +44,18 @@ FOLLOW_TIME = 10 * 1000
 BACK_UP_TIME = 1000
 TURN_TIME = 1700
 
-queen_id = 17
-
 def fall(): 
-    found_flower = False
-    start_time = 0
-    target_theta = 0
-    my_color = -1
+    def restart()
+        found_flower = False
+        start_time = 0
+        target_theta = 0
+        my_color = -1
+        beh.init(0.22, 40, 0.5, 0.1)
+        state = STATE_IDLE
     def wander():
         state = STATE_WANDER
     def collect_pollen():
         state = STATE_COLLECT_POLLEN
-        start_time = sys.time()
-    def follow():
-        state = STATE_FOLLOW
-        start_time = sys.time()
-    def recruit():
-        state = STATE_RECRUIT
         start_time = sys.time()
     def align_with(target):
         target_theta = target
@@ -68,8 +63,8 @@ def fall():
         state = STATE_ALIGN
         start_time = sys.time()
 
-    beh.init(0.22, 40, 0.5, 0.1)
-    state = STATE_IDLE
+    restart()
+
     #motion_start_odo = pose.get_odometer()
 
     while True:
@@ -78,6 +73,9 @@ def fall():
         if new_nbrs:
             print nbrList
         beh_out = beh.BEH_INACTIVE
+
+        if rone.button_get_value('g'):
+            restart()
 
         #FINITE STATE MACHINE
         if state == STATE_IDLE:
@@ -140,9 +138,11 @@ def fall():
             elif neighbors.get_nbr_range_bits(queen) > 2:
                 beh_out = beh.follow_nbr(queen, MOTION_TV)
             elif found_flower:
-                recruit()
+                state = STATE_RECRUIT
+                start_time = sys.time()
             else:
-                follow()
+                state = STATE_FOLLOW
+                start_time = sys.time()
 
         elif state == STATE_FOLLOW:
             recruiter = find_recruiter()
