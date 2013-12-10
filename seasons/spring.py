@@ -38,7 +38,7 @@ def spring():
     followers = 0
     beh.init(0.22, 40, 0.5, 0.1)
     state = STATE_IDLE
-    
+
     while True:
         # run the system updates
         new_nbrs = beh.update()
@@ -57,18 +57,18 @@ def spring():
             leds.set_pattern('rb', 'group', LED_BRIGHTNESS)
             if new_nbrs:
                 print "idle"
-                
+
             if rone.button_get_value('r'):
                 pose.set_pose(0, 0, 0)
                 state = STATE_WANDER
             elif rone.button_get_value('b'):
                 state = STATE_QUEEN
-                
+
         elif state == STATE_WANDER:
-##            leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
+            ##            leds.set_pattern('r', 'circle', LED_BRIGHTNESS)
             nav = hba.find_nav_tower_nbr(NAV_ID)
             beh_out = beh.avoid_nbr(nav, MOTION_TV)
-            
+
             if bump_front():
                 tree_pose = pose.get_pose()
                 motion.set_goal((0.0, 0.0), MOTION_TV)
@@ -76,9 +76,9 @@ def spring():
             elif nav == None:
                 motion.set_goal((0.0, 0.0), MOTION_TV)
                 state = STATE_RETURN
-       
+
         elif state == STATE_RETURN:
-##            nav_tower = hba.find_nav_tower_nbr(NAV_ID)
+            ##            nav_tower = hba.find_nav_tower_nbr(NAV_ID)
             queen = None
             recruiter = None
             leader = None
@@ -96,7 +96,8 @@ def spring():
 ##            elif nav_tower == None:
 ##                beh_out = beh.tvrv(-MOTION_TV, 0)
             elif queen == None:
-                beh_out = motion.update()
+                (tv, rv) = motion.update()
+                beh_out = beh.tvrv(tv, rv)
             elif not close_to_nbr(queen):
                 beh_out = beh.follow_nbr(queen, MOTION_TV)
             elif (tree_pose != None) and (recruiter == None):
@@ -105,7 +106,7 @@ def spring():
             else:
                 start_time = sys.time()
                 state = STATE_FOLLOW
-            
+
         elif state == STATE_RECRUIT:
             leader = False
             new_followers = 0
@@ -126,7 +127,7 @@ def spring():
                 state = STATE_LEADER
 
         elif state == STATE_QUEEN:
-##            leds.set_pattern('b', 'circle', LED_BRIGHTNESS)
+            ##            leds.set_pattern('b', 'circle', LED_BRIGHTNESS)
             leader = None
             for nbr in nbr_list:
                 nbr_state = hba.get_msg_from_nbr(nbr,new_nbrs)[MSG_IDX_STATE]
@@ -137,7 +138,7 @@ def spring():
                 state = STATE_FOLLOW
             else:
                 beh_out = beh.BEH_INACTIVE
-                    
+
         elif state == STATE_FOLLOW: 
             recruiter = None
             leader = None
@@ -172,10 +173,11 @@ def spring():
                 beh_out = beh.BEH_INACTIVE
 
         elif state == STATE_LEADER:
-            beh_out = motion.update()
+            (tv, rv) = motion.update()
+            beh_out = beh.tvrv(tv, rv)
             if motion.is_done():
                 state = STATE_SUCCESS
-                
+
         elif state == STATE_SUCCESS:
             leds.set_pattern('g', 'circle', LED_BRIGHTNESS)
             beh_out = beh.BEH_INACTIVE
